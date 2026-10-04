@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O-NET Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+
+/* Layout: one-screen game shell — top bar (player + XP), stage card in the middle; islands as a 2-col grid of "ports" */
+:root{
+  --sky:#EAF4F4; --surface:#FFFFFF; --ink:#12313A; --muted:#5A7279; --line:#CFE1E2;
+  --lagoon:#0B7E86; --lagoon-soft:#D5EEEF; --sun:#E9A21F; --sun-soft:#FDF0D3;
+  --good:#23885A; --good-soft:#DDF2E7; --bad:#C9483E; --bad-soft:#FBE3E0; --lock:#9AB0B4;
+  --display:"Mitr","Noto Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --sky:#0D1E23; --surface:#15292F; --ink:#E6F1F2; --muted:#9BB3B8; --line:#26424A;
+  --lagoon:#3FB8BF; --lagoon-soft:#16393E; --sun:#F2B94A; --sun-soft:#3A2F14;
+  --good:#5CC98F; --good-soft:#163628; --bad:#F07A70; --bad-soft:#3D1D1A; --lock:#4E666B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#0D1E23; --surface:#15292F; --ink:#E6F1F2; --muted:#9BB3B8; --line:#26424A;
+  --lagoon:#3FB8BF; --lagoon-soft:#16393E; --sun:#F2B94A; --sun-soft:#3A2F14;
+  --good:#5CC98F; --good-soft:#163628; --bad:#F07A70; --bad-soft:#3D1D1A; --lock:#4E666B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;padding:0 16px 32px}
+h1,h2,h3{font-family:var(--display);font-weight:500;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px;padding-top:14px}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.brand{font-family:var(--display);font-size:22px;color:var(--lagoon);display:flex;align-items:center;gap:8px}
+.brand small{font-family:var(--body);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:2px 8px}
+.who{display:flex;align-items:center;gap:10px;font-weight:500}
+.xp{background:var(--sun-soft);color:var(--ink);border-radius:99px;padding:4px 12px;font-variant-numeric:tabular-nums;font-weight:600}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;padding:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.muted{color:var(--muted)}
+.btn{border:none;border-radius:12px;padding:12px 20px;font-weight:600;background:var(--lagoon);color:#fff;font-size:17px}
+.btn.ghost{background:var(--lagoon-soft);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+/* login */
+.avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.av{border:2px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.av span{font-size:40px;line-height:1}
+.av b{font-family:var(--display);font-weight:500}
+.av:hover{border-color:var(--lagoon)}
+/* map */
+.islands{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.isl{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
+.isl .ic{grid-row:span 3;font-size:42px}
+.isl h3{font-size:20px}
+.isl .std{font-size:13px;color:var(--muted)}
+.isl.locked{opacity:.6;cursor:default}
+.prog{height:8px;border-radius:99px;background:var(--lagoon-soft);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--lagoon)}
+.stars{color:var(--sun);letter-spacing:2px;font-size:15px}
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lvl{border:2px solid var(--line);background:var(--surface);border-radius:var(--r);padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.lvl.on{border-color:var(--lagoon)}
+.lvl.locked{opacity:.55;cursor:default}
+.lvl h3{font-size:19px}
+.goal{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 14px}
+.chip.on{border-color:var(--lagoon);background:var(--lagoon-soft)}
+/* question */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots i.ok{background:var(--good)}.dots i.no{background:var(--bad)}.dots i.cur{background:var(--lagoon)}
+.scene{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.scene .em{font-size:56px;line-height:1}
+.ctx{white-space:pre-line;font-size:19px;min-width:0}
+.ctx b{font-weight:600}
+.q{font-family:var(--display);font-size:20px;margin-top:8px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;text-align:left;font-size:18px;display:flex;gap:10px;align-items:flex-start}
+.opt .k{font-family:var(--display);color:var(--lagoon);min-width:1.2em}
+.opt:hover:not(:disabled){border-color:var(--lagoon)}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.no{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.fb{border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{background:var(--good-soft)}.fb.no{background:var(--bad-soft)}
+.fb .en{font-weight:600}
+.th{background:var(--sun-soft);border-radius:10px;padding:10px 12px}
+.pic{grid-column:1/-1}.pic img{display:block;max-width:380px;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.scene.haspic{grid-template-columns:1fr}
+.tablewrap .em{font-size:30px}.tablewrap .pic img{max-width:200px}
+.speak{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:14px}
+/* results / badges */
+.big{font-family:var(--display);font-size:40px;color:var(--sun);letter-spacing:4px}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.badge{border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;background:var(--surface)}
+.badge span{font-size:34px;display:block}
+.badge.off{opacity:.35;filter:grayscale(1)}
+.feel{display:flex;gap:10px}.feel button{font-size:34px;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 14px}
+.feel button.on{border-color:var(--lagoon)}
+/* teacher / expert */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:600}
+.p1{background:var(--bad-soft);color:var(--bad)}.p2{background:var(--sun-soft);color:var(--ink)}.p3{background:var(--good-soft);color:var(--good)}
+.note{font-size:13px;color:var(--muted)}
+input[type=password],select{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+@media (max-width:560px){.opts{grid-template-columns:1fr}.avatars{grid-template-columns:repeat(3,1fr)}.scene{grid-template-columns:1fr}.scene .em{font-size:44px}}
+@media (prefers-reduced-motion:no-preference){.pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="bar">
+    <div class="brand">🏝️ O-NET Quest </div>
+    <div class="who" id="who"></div>
+  </div>
+  <main id="app"></main>
+</div>
+
+
+<script>
+const LV={1:"🌱 พื้นฐาน",2:"🌿 กลาง",3:"🌳 ผ่าน"};
+const CODE_TH={FUNC:"เลือกสำนวนผิดสถานการณ์",ROLE:"สับสนบทบาทผู้พูด",WH:"สับสนคำถาม Wh-",YN:"ตอบ Yes/No กับ Or-question",CONJ:"คำเชื่อมผิดความหมาย",CAUSE:"เหตุผลไม่เข้ากับความรู้สึก",KEY:"จับคำแต่ไม่ตอบคำถาม",SYM:"ตีความป้ายผิด",ORD:"เรียงคำผิด",DATA:"อ่านตารางผิด",NUM:"อ่านตัวเลขผิด",MAIN:"ใจความสำคัญ",FACT:"แยกข้อเท็จจริงกับความคิดเห็น",PUNC:"ตัวพิมพ์ใหญ่และเครื่องหมายวรรคตอน",INTO:"การขึ้นลงของเสียง",CULT:"เทศกาลและวัฒนธรรม"};
+const BADGES=[{k:"explorer",e:"🗺️",n:"Explorer",d:"เล่นครบทุกเกาะที่เปิด"},{k:"TT",e:"🗣️",n:"Talk Town Master",d:"ผ่านระดับ 3 ของ Talk Town"},{k:"SH",e:"🏫",n:"School Hall Master",d:"ผ่านระดับ 3 ของ School Hall"},{k:"fixer",e:"🔧",n:"Fixer",d:"ผ่านด่าน Fix-it 5 ครั้ง"},{k:"sharp",e:"🎯",n:"Sharp Eye",d:"ได้ 3 ดาว 5 รอบติดกัน"},{k:"ready",e:"🏆",n:"O-NET Ready",d:"ผ่านระดับ 3 ครบทุกเกาะ"}];
+const ROUND=6;
+
+const ISLANDS = [
+  {k:"TT",name:"Talk Town",ic:"🗣️",std:"ต 1.2 การสื่อสารระหว่างบุคคล",set:1},
+  {k:"SH",name:"School Hall",ic:"🏫",std:"ต 4.1 ภาษาในโรงเรียน",set:1},
+  {k:"SS",name:"Sign & Story Forest",ic:"🪧",std:"ต 1.1 ป้ายและเรื่องสั้น",set:2},
+  {k:"DL",name:"Data Lab",ic:"📊",std:"ต 1.3 ตารางและแผนภูมิ",set:2},
+  {k:"SW",name:"Sentence Workshop",ic:"🔤",std:"ต 2.2 ประโยคและวรรคตอน",set:3},
+  {k:"CP",name:"Culture Port",ic:"🎉",std:"ต 2.1 เทศกาลและวันสำคัญ",set:3}];
+let ITEMS=[], PLAYERS=[], OPEN=["TT","SH"];
+let me=null, S={}, PIN="", TPIN="";
+const $=s=>document.querySelector(s), app=$("#app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- server calls ---------- */
+const API_URL="https://script.google.com/macros/s/AKfycbw2UT_3VOCqesMBYJr2oAHEyfgIHU1oicCeLrQ8hvF5i4epoA9pIwJjUzdeQzmS7Wne/exec";
+function gsr(fn,args){if(typeof google==="undefined"||!google.script)return Promise.reject("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่");return new Promise((res,rej)=>{google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(e&&e.message?e.message:String(e)))[fn](...args)})}
+let useFetch=true;
+function call(fn,...args){
+ if(!API_URL||!useFetch||typeof fetch!=="function")return gsr(fn,args);
+ const ctl=typeof AbortController!=="undefined"?new AbortController():null;
+ const tm=setTimeout(()=>{if(ctl)ctl.abort()},15000);
+ return fetch(API_URL,{method:"POST",body:JSON.stringify({fn,args}),redirect:"follow",credentials:"omit",signal:ctl?ctl.signal:undefined})
+  .then(r=>r.text()).then(t=>{clearTimeout(tm);let j;try{j=JSON.parse(t)}catch(_){throw{net:1}}return j},e=>{clearTimeout(tm);throw (e&&e.net)?e:{net:1}})
+  .then(j=>{if(j&&j.ok)return j.data;if(j&&j.ok===false)throw{srv:j.error||"error"};throw{net:1}})
+  .catch(e=>{if(e&&e.srv)throw e.srv;useFetch=false;return gsr(fn,args)})
+}
+function blankState(){return {xp:0,stats:{},ft:{},badges:[],wrong:[],codeCount:{},errTotal:{},fixits:0,streak3:0,thClicks:0,feel:{}}}
+function P(){return me.state}
+const LKEY=id=>"onetquest-pending-"+id;
+function pending(){try{return JSON.parse(localStorage.getItem(LKEY(me.id)))||[]}catch(e){return []}}
+function setPending(a){try{localStorage.setItem(LKEY(me.id),JSON.stringify(a))}catch(e){}}
+function addLog(x){const a=pending();a.push(x);setPending(a)}
+function syncMsg(t,bad){const m=$("#sync");if(m){m.textContent=t;m.style.color=bad?"var(--bad)":"var(--muted)"}}
+async function flush(){
+  if(!me)return;
+  const logs=pending();
+  syncMsg("กำลังบันทึก…");
+  try{await call("saveBatch",me.id,PIN,logs,me.state);
+    const now=pending(); setPending(now.slice(logs.length)); syncMsg("บันทึกแล้ว ✓");
+  }catch(e){syncMsg("ยังบันทึกไม่สำเร็จ (เน็ตอาจหลุด) ระบบจะลองใหม่อัตโนมัติ",true)}
+}
+
+/* ---------- header ---------- */
+function header(){
+  const w=$("#who");
+  if(!me){w.innerHTML=`<button class="link" onclick="teacherLogin()">หน้าครู</button><button class="link" onclick="expertLogin()">หน้าผู้เชี่ยวชาญ</button>`;return}
+  w.innerHTML=`<span style="font-size:28px">${esc(me.emoji)}</span><span>${esc(me.name)}</span><span class="xp">⭐ ${P().xp} XP</span><span id="sync" class="note"></span><button class="link" onclick="logout()">ออก</button>`;
+}
+function logout(){flush();me=null;PIN="";home()}
+
+/* ---------- boot ---------- */
+function boot(){
+  app.innerHTML=`<div class="card"><p class="muted">กำลังโหลดเกม…</p></div>`;
+  call("getBootstrap").then(d=>{ITEMS=d.items;PLAYERS=d.players;OPEN=d.open;home()})
+   .catch(e=>{app.innerHTML=`<div class="card"><b>โหลดเกมไม่สำเร็จ</b><p class="muted">${esc(e)}</p><button class="btn" onclick="boot()">ลองใหม่</button></div>`});
+}
+
+/* ---------- login ---------- */
+function home(){
+  header();
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:16px">
+   <div><h1 style="font-size:28px">Who are you?</h1><p class="muted" style="margin:4px 0 0">เลือกตัวละครของตัวเองเพื่อเริ่มเล่น</p></div>
+   <div class="avatars">${PLAYERS.map(p=>`<button class="av" onclick="pinScreen('${esc(p.id)}')"><span>${esc(p.emoji)}</span><b>${esc(p.name)}</b><small class="muted">${esc(p.id)}</small></button>`).join("")}</div></div>`;
+}
+function pinScreen(id){
+  const p=PLAYERS.find(x=>x.id===id);
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:12px;max-width:420px">
+   <div class="row"><span style="font-size:44px">${esc(p.emoji)}</span><h2>${esc(p.name)}</h2></div>
+   <label for="spin">ใส่ PIN 4 หลักของตัวเอง</label><input id="spin" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+   <div class="row"><button class="btn" id="go" onclick="doLogin('${esc(id)}')">เข้าเกม</button><button class="link" onclick="home()">ไม่ใช่ฉัน</button></div><span id="lmsg" class="note"></span></div>`;
+  const i=$("#spin");i.focus();i.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin(id)});
+}
+async function doLogin(id){
+  const pin=$("#spin").value; $("#go").disabled=true; $("#lmsg").textContent="กำลังเข้าเกม…";
+  try{const r=await call("login",id,pin);const p=PLAYERS.find(x=>x.id===id);
+    me={...p,state:Object.assign(blankState(),r.state||{})}; me.state.start=r.start; PIN=pin; map(); if(pending().length)flush();
+  }catch(e){$("#lmsg").textContent=e;$("#go").disabled=false}
+}
+
+/* ---------- progress logic ---------- */
+function stat(p,isl,lv){return p.stats[isl+"-"+lv]||{last:[],best:0,played:0}}
+function levelStatus(p,isl,lv){
+  const st=stat(p,isl,lv), acc=st.last.length?st.last.reduce((a,b)=>a+b,0)/st.last.length:0;
+  const passed=st.last.length>0&&acc>=0.8;
+  const start=(p.start&&p.start[isl])||1;
+  const unlocked=lv<=start||levelStatus(p,isl,lv-1).passed;
+  return {passed,unlocked,best:st.best,played:st.played,acc};
+}
+function islandProgress(p,k){let n=0;for(const l of [1,2,3]) if(levelStatus(p,k,l).passed) n++;return n/3}
+
+/* ---------- map / island ---------- */
+function map(){
+  header();const p=P();
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px" class="pop">
+   <div class="row" style="justify-content:space-between"><h2 style="font-size:24px">Island Map</h2><button class="btn ghost" onclick="badges()">🏅 ตู้เหรียญ (${p.badges.length})</button></div>
+   <div class="islands">${ISLANDS.map(i=>{
+     const open=OPEN.includes(i.k)&&ITEMS.some(x=>x.isl===i.k);
+     if(!open) return `<div class="isl locked"><span class="ic">${i.ic}</span><h3>${i.name}</h3><span class="std">${i.std}</span><span class="note">🔒 เปิดเร็ว ๆ นี้</span></div>`;
+     const pr=islandProgress(p,i.k), st=[1,2,3].map(l=>levelStatus(p,i.k,l).passed?"★":"☆").join("");
+     return `<button class="isl" onclick="island('${i.k}')"><span class="ic">${i.ic}</span><h3>${i.name}</h3><span class="std">${i.std}</span><span class="row" style="gap:10px"><span class="prog" style="flex:1"><i style="width:${pr*100}%"></i></span><span class="stars">${st}</span></span></button>`}).join("")}
+   </div></div>`;
+}
+function island(k){
+  header();const p=P(), I=ISLANDS.find(i=>i.k===k);
+  S={isl:k,goal:"5"};
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px" class="pop">
+   <div class="row"><button class="link" onclick="map()">← แผนที่</button></div>
+   <div class="row"><span style="font-size:44px">${I.ic}</span><div><h2 style="font-size:26px">${I.name}</h2><span class="muted">${I.std}</span></div></div>
+   <div class="card" style="display:flex;flex-direction:column;gap:10px"><b>🎯 เป้าหมายรอบนี้ (Set your goal)</b>
+     <div class="goal" id="goal">${[["4","⭐ ถูก 4 ข้อ"],["5","⭐⭐ ถูก 5 ข้อ"],["6","⭐⭐⭐ ถูกครบ 6 ข้อ"]].map(([v,t])=>`<button class="chip ${v==="5"?"on":""}" data-v="${v}" onclick="setGoal(this)">${t}</button>`).join("")}</div></div>
+   <div class="levels">${[1,2,3].map(l=>{const s=levelStatus(p,k,l), has=ITEMS.some(x=>x.isl===k&&x.lv===l);
+     const ok=s.unlocked&&has;
+     return `<button class="lvl ${ok?"":"locked"} ${s.passed?"on":""}" ${ok?`onclick="startRound('${k}',${l})"`:"disabled"}>
+       <h3>${LV[l]}</h3><span class="stars">${"★".repeat(s.best)}${"☆".repeat(3-s.best)}</span>
+       <span class="note">${!has?"ยังไม่มีข้อที่ครูตรวจแล้ว":s.unlocked?(s.passed?"ผ่านแล้ว ✓":s.played?`เล่นแล้ว ${s.played} รอบ · ต้องได้ 80% ใน 2 รอบล่าสุด`:"พร้อมเล่น"):"🔒 ผ่านระดับก่อนหน้าก่อน"}</span></button>`}).join("")}</div></div>`;
+}
+function setGoal(b){document.querySelectorAll("#goal .chip").forEach(c=>c.classList.remove("on"));b.classList.add("on");S.goal=b.dataset.v}
+
+/* ---------- round ---------- */
+function startRound(k,l,fixCode){
+  const p=P(); let pool;
+  if(fixCode){pool=shuffle(ITEMS.filter(i=>i.c.includes(fixCode))).slice(0,3)}
+  else{
+    pool=shuffle(ITEMS.filter(i=>i.isl===k&&i.lv===l)).slice(0,ROUND);
+    const review=p.wrong.map(id=>ITEMS.find(i=>i.id===id)).filter(i=>i&&i.isl===k&&!pool.includes(i));
+    if(review.length&&pool.length>=ROUND){pool[ROUND-1]=review[Math.floor(Math.random()*review.length)];pool=shuffle(pool)}
+  }
+  S={...S,isl:k,lv:l,fix:fixCode||null,items:pool.map(it=>({it,ord:shuffle([0,1,2,3])})),i:0,ok:0,xp:0,res:[]};
+  question();
+}
+function question(){
+  header();
+  const q=S.items[S.i], it=q.it;
+  S.try=1;S.qt=Date.now();
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:16px">
+   <div class="qhead"><span>${S.fix?`🔧 Fix-it: ${CODE_TH[S.fix]||S.fix}`:`${ISLANDS.find(i=>i.k===S.isl).name} · ${LV[S.lv]}`}</span>
+     <span class="dots">${S.items.map((_,j)=>`<i class="${j<S.i?(S.res[j]?"ok":"no"):j===S.i?"cur":""}"></i>`).join("")}</span></div>
+   <div class="scene${(isPic(it.img)||!it.img)?" haspic":""}">${pic(it.img)}<div><div class="ctx">${fmt(it.ctx)}</div><div class="q">${esc(it.q)}</div>
+     <div class="row" style="margin-top:8px"><button class="speak" onclick="say()">🔊 Listen</button><span id="saymsg" class="note" aria-live="polite"></span></div></div></div>
+   <div class="opts" id="opts">${q.ord.map((o,j)=>`<button class="opt" data-o="${o}" onclick="answer(${o},this)"><span class="k">${"ABCD"[j]}</span><span>${esc(it.o[o])}</span></button>`).join("")}</div>
+   <div id="fb"></div></div>`;
+}
+const isPic=v=>String(v||"").indexOf("data:")===0;
+function pic(v){if(!v)return "";return isPic(v)?`<div class="pic"><img src="${v}" alt=""></div>`:`<div class="em">${esc(v)}</div>`}
+function fmt(t){return esc(t).replace(/^([A-Za-z][A-Za-z ]{0,18}):/gm,"<b>$1:</b>")}
+function answer(o,btn){
+  const p=P(), q=S.items[S.i], it=q.it, lv=S.fix?1:S.lv, correct=o===0;
+  addLog({t:Date.now(),id:it.id,isl:it.isl,lv:it.lv,ans:"ABCD"[q.ord.indexOf(o)],ok:correct,code:it.c[o],try:S.try,ms:Date.now()-S.qt,fix:!!S.fix});
+  if(S.try===1&&!S.fix){p.ft[it.isl]=p.ft[it.isl]||{n:0,ok:0};p.ft[it.isl].n++;if(correct)p.ft[it.isl].ok++}
+  const opts=[...document.querySelectorAll(".opt")];
+  if(correct){
+    btn.classList.add("ok");opts.forEach(b=>b.disabled=true);
+    const gain=S.try===1?10:5; S.xp+=gain;
+    if(S.try===1){S.ok++;S.res[S.i]=true;p.wrong=p.wrong.filter(x=>x!==it.id)} else S.res[S.i]=false;
+    showFb(true,it,0,lv,`+${gain} XP`);
+  }else{
+    btn.classList.add("no");btn.disabled=true;
+    const code=it.c[o]; p.codeCount[code]=(p.codeCount[code]||0)+1; p.errTotal[code]=(p.errTotal[code]||0)+1;
+    if(!p.wrong.includes(it.id)) p.wrong.push(it.id);
+    if(S.try===1){S.try=2;S.res[S.i]=false;showFb(false,it,o,lv,"ลองอีกครั้ง (Try again)")}
+    else{opts.forEach(b=>{b.disabled=true;if(+b.dataset.o===0)b.classList.add("ok")});showFb(false,it,o,lv,"ดูคำตอบที่ถูกแล้วไปต่อ",true)}
+  }
+}
+function showFb(ok,it,o,lv,tag,final){
+  S.curTh=`<div class="th">💡 ${esc(it.th[o])}</div>`;
+  const thPart= !it.th[o]?"": lv===1? S.curTh : lv===2? `<button class="link" style="align-self:flex-start" onclick="revealTh(this)">💡 ดูคำอธิบายภาษาไทย</button>` : "";
+  const next= ok||final ? `<button class="btn" style="align-self:flex-start" onclick="nextQ()">${S.i<S.items.length-1?"Next →":"See results"}</button>`:"";
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"no"} pop"><span class="en">${ok?"✅":"❌"} ${esc(it.en[o]||"")}</span>${thPart}<span class="note">${tag}</span>${next}</div>`;
+}
+function revealTh(b){b.outerHTML=S.curTh;P().thClicks++}
+function nextQ(){S.i++; if(S.i<S.items.length) question(); else results()}
+
+function results(){
+  const p=P(), n=S.items.length, stars=S.fix?0:(S.ok>=6?3:S.ok>=5?2:S.ok>=4?1:0);
+  const bonus=S.fix&&S.ok>=2?15:0; p.xp+=S.xp+bonus;
+  if(S.fix&&S.ok>=2){p.fixits++;p.codeCount[S.fix]=0}
+  if(!S.fix){const k=S.isl+"-"+S.lv, st=stat(p,S.isl,S.lv);st.last=st.last.concat([S.ok/n]).slice(-2);st.best=Math.max(st.best,stars);st.played++;p.stats[k]=st;p.streak3=stars===3?p.streak3+1:0}
+  header();
+  const before=new Set(p.badges), earn=k=>{if(!p.badges.includes(k))p.badges.push(k)};
+  const openK=OPEN.filter(k=>ITEMS.some(x=>x.isl===k));
+  if(openK.length&&openK.every(k=>[1,2,3].some(l=>stat(p,k,l).played))) earn("explorer");
+  for(const k of ["TT","SH"]) if(levelStatus(p,k,3).passed) earn(k);
+  if(p.fixits>=5) earn("fixer"); if(p.streak3>=5) earn("sharp");
+  if(ISLANDS.every(i=>levelStatus(p,i.k,3).passed)) earn("ready");
+  const newB=p.badges.filter(b=>!before.has(b)).map(b=>BADGES.find(x=>x.k===b)).filter(Boolean);
+  const fixCode=!S.fix&&Object.entries(p.codeCount).filter(([c,v])=>v>=2&&c!=="-").sort((a,b)=>b[1]-a[1]).map(x=>x[0])[0];
+  const goalMet=S.fix?null:S.ok>=+S.goal;
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+   <h2 style="font-size:26px">${S.fix?"Fix-it complete!":"Round complete!"}</h2>
+   ${S.fix?"":`<div class="big">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>`}
+   <div>ถูกครั้งแรก <b>${S.ok}/${n}</b> ข้อ · ได้ <b>+${S.xp+bonus} XP</b></div>
+   ${goalMet===null?"":`<div class="${goalMet?"fb ok":"fb no"}" style="width:100%">${goalMet?"🎯 ทำได้ตามเป้าหมายที่ตั้งไว้!":"🎯 ยังไม่ถึงเป้าหมาย ลองอีกครั้งนะ"}</div>`}
+   ${newB.length?`<div><b>🏅 เหรียญใหม่!</b><div class="badges" style="margin-top:8px">${newB.map(b=>`<div class="badge"><span>${b.e}</span>${b.n}</div>`).join("")}</div></div>`:""}
+   <div><b>รู้สึกอย่างไรกับรอบนี้?</b><div class="feel" id="feel">${["😀","😐","😕"].map(e=>`<button onclick="feel(this,'${e}')">${e}</button>`).join("")}</div></div>
+   ${fixCode?`<div class="fb no" style="width:100%"><b>🔧 ด่านซ่อม Fix-it เปิดแล้ว!</b><span>คุณเลือกผิดแบบ "${CODE_TH[fixCode]||fixCode}" มากกว่า 1 ครั้ง ลองฝึก 3 ข้อสั้น ๆ</span><button class="btn" style="align-self:flex-start" onclick="startRound('${S.isl}',${S.lv},'${fixCode}')">เริ่ม Fix-it</button></div>`:""}
+   <div class="row"><button class="btn ghost" onclick="island('${S.isl}')">เลือกระดับ</button><button class="btn ghost" onclick="map()">แผนที่</button></div></div>`;
+  flush();
+}
+function feel(b,e){document.querySelectorAll("#feel button").forEach(x=>x.classList.remove("on"));b.classList.add("on");const p=P();p.feel[e]=(p.feel[e]||0)+1;b.parentNode.querySelectorAll("button").forEach(x=>x.disabled=true)}
+function badges(){
+  header();const p=P();
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px" class="pop"><button class="link" style="align-self:flex-start" onclick="map()">← แผนที่</button>
+   <h2 style="font-size:24px">ตู้เหรียญ</h2><div class="badges">${BADGES.map(b=>`<div class="badge ${p.badges.includes(b.k)?"":"off"}"><span>${b.e}</span><b>${b.n}</b><div class="note">${b.d}</div></div>`).join("")}</div></div>`;
+}
+
+/* ---------- teacher ---------- */
+function teacherLogin(){
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:12px;max-width:420px"><h2>หน้าครู</h2>
+   <label for="pin">PIN ครู</label><input id="pin" type="password" inputmode="numeric" maxlength="8">
+   <div class="row"><button class="btn" onclick="TPIN=$('#pin').value;teacher()">เข้าสู่หน้าครู</button><button class="link" onclick="home()">กลับ</button></div><span id="pinmsg" class="note"></span></div>`;
+}
+async function teacher(){
+  let d; try{d=await call("teacherData",TPIN)}catch(e){const m=$("#pinmsg");if(m)m.textContent=e;else alertBox(e);return}
+  header();
+  const rows=d.players.map(pl=>{const p=Object.assign(blankState(),pl.state||{});p.start=pl.start;
+    return `<tr><td>${esc(pl.emoji)} ${esc(pl.id)}<div class="note">${esc(pl.name)}</div></td>${OPEN.map(k=>{
+      const lvNow=[3,2,1].find(l=>levelStatus(p,k,l).unlocked)||1, passed=[1,2,3].filter(l=>levelStatus(p,k,l).passed).length;
+      const f=p.ft[k], acc=f&&f.n?Math.round(100*f.ok/f.n)+"%":"–";
+      return `<td><span class="pill p${lvNow}">${LV[lvNow]}</span><div class="note">ผ่าน ${passed}/3 · ถูก ${acc}</div>
+        <select aria-label="ระดับเริ่ม ${k}" onchange="setStart('${esc(pl.id)}','${k}',this.value)">${[1,2,3].map(l=>`<option value="${l}" ${pl.start[k]==l?"selected":""}>เริ่มระดับ ${l}</option>`).join("")}</select></td>`}).join("")}
+    <td>${p.xp}</td><td>${p.thClicks}</td></tr>`}).join("");
+  const all={};d.players.forEach(pl=>{const e=(pl.state&&pl.state.errTotal)||{};for(const c in e)all[c]=(all[c]||0)+e[c]});
+  const top=Object.entries(all).filter(([c])=>c!=="-").sort((a,b)=>b[1]-a[1]).slice(0,3);
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px" class="pop">
+   <div class="row" style="justify-content:space-between"><h2 style="font-size:24px">หน้าครู</h2><div class="row"><a class="link" href="${esc(d.url)}" target="_blank" rel="noopener">เปิด Google Sheet</a><button class="link" onclick="teacher()">รีเฟรช</button><button class="link" onclick="TPIN='';home()">ออก</button></div></div>
+   <div class="card"><b>ข้อผิดพลาดที่พบบ่อยของทั้งชั้น (ใช้ในขั้น P)</b>
+     <div style="margin-top:8px">${top.length?top.map(([c,v],i)=>`<div>${i+1}. <b>${c}</b> ${CODE_TH[c]||""} — ${v} ครั้ง</div>`).join(""):'<span class="muted">ยังไม่มีข้อมูล ให้นักเรียนเล่นก่อน</span>'}</div></div>
+   <div class="card tablewrap"><table><thead><tr><th>นักเรียน</th>${OPEN.map(k=>`<th>${ISLANDS.find(i=>i.k===k).name}</th>`).join("")}<th>XP</th><th>กดดูคำอธิบายไทย</th></tr></thead><tbody>${rows}</tbody></table>
+   <p class="note">ระดับเริ่มตั้งจากผลทดสอบก่อนเรียน: ต่ำกว่า 50% = 1, 50–79% = 2, 80% ขึ้นไป = 3 · ข้อมูลทุกคำตอบอยู่ในแท็บ "บันทึกคำตอบ" ของ Google Sheet</p></div>
+   <div class="card" style="display:flex;flex-direction:column;gap:8px"><b>ทดสอบเสียงบนเครื่องนี้</b>
+     <div class="row"><button class="btn ghost" onclick="voiceTest()">🔊 ทดสอบเสียงอ่าน</button></div><div id="vt" class="note"></div></div></div>`;
+}
+async function setStart(id,k,v){try{await call("setStart",TPIN,id,k,+v)}catch(e){alertBox(e)}}
+function alertBox(t){const d=document.createElement("div");d.className="fb no";d.textContent=String(t);app.prepend(d);setTimeout(()=>d.remove(),5000)}
+
+/* ---------- expert ---------- */
+function expertLogin(){
+  app.innerHTML=`<div class="card pop" style="display:flex;flex-direction:column;gap:12px;max-width:420px"><h2>หน้าผู้เชี่ยวชาญ</h2>
+   <label for="epin">PIN ผู้เชี่ยวชาญ</label><input id="epin" type="password" maxlength="8">
+   <div class="row"><button class="btn" onclick="expertLoad()">เข้าดูข้อสอบ</button><button class="link" onclick="home()">กลับ</button></div><span id="emsg" class="note"></span></div>`;
+}
+async function expertLoad(){try{S.exItems=await call("expertItems",$("#epin").value);S.ef="ALL";expert()}catch(e){$("#emsg").textContent=e}}
+function expert(){
+  header();const f=S.ef||"ALL", all=S.exItems||[], list=all.filter(i=>f==="ALL"||i.isl===f);
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px" class="pop">
+   <div class="row" style="justify-content:space-between"><h2 style="font-size:24px">หน้าผู้เชี่ยวชาญ (${list.length} ข้อ)</h2><button class="link" onclick="home()">กลับ</button></div>
+   <div class="row"><label for="ef">เกาะ</label><select id="ef" onchange="S.ef=this.value;expert()"><option value="ALL">ทั้งหมด</option>${ISLANDS.map(i=>`<option value="${i.k}" ${f===i.k?"selected":""}>${i.name}</option>`).join("")}</select></div>
+   <div class="card tablewrap"><table><thead><tr><th>รหัส</th><th>ตัวชี้วัด</th><th>สถานการณ์ / คำถาม</th><th>ตัวเลือก (✓ = เฉลย) · รหัสตัวลวง</th></tr></thead><tbody>
+   ${list.map(i=>`<tr><td>${esc(i.id)}<div class="note">${LV[i.lv]||i.lv}</div><div class="note">${esc(i.status)}</div></td><td>${esc(i.ind)}<div class="note">${esc(i.fn)}</div></td><td style="white-space:pre-line;min-width:200px">${pic(i.img)}${esc(i.ctx)}<div><b>${esc(i.q)}</b></div></td>
+     <td style="min-width:220px">${i.o.map((o,j)=>`<div>${j===0?"✓":"·"} ${esc(o)} <span class="note">${j?esc(i.c[j]):""}</span></div>`).join("")}</td></tr>`).join("")}
+   </tbody></table></div></div>`;
+}
+
+
+
+function sayMsg(t){const m=$("#saymsg");if(m)m.textContent=t}
+function getVoices(){return new Promise(res=>{let v=[];try{v=speechSynthesis.getVoices()}catch(e){}
+  if(v.length)return res(v);let done=false;const fin=()=>{if(done)return;done=true;let w=[];try{w=speechSynthesis.getVoices()}catch(e){}res(w)};
+  try{speechSynthesis.addEventListener("voiceschanged",fin,{once:true})}catch(e){}setTimeout(fin,1500)})}
+async function say(){
+  if(!("speechSynthesis" in window)){sayMsg("เบราว์เซอร์นี้ไม่รองรับการอ่านออกเสียง ลองเปิดเกมใน Google Chrome หรือ Microsoft Edge");return}
+  const it=S.items[S.i].it, text=(it.ctx+". "+it.q).replace(/_+/g,"blank").replace(/\n/g,". ");
+  sayMsg("กำลังโหลดเสียง…");
+  const voices=await getVoices();
+  const en=voices.filter(v=>/^en(-|_|$)/i.test(v.lang));
+  if(!voices.length){sayMsg("เครื่องนี้ยังไม่มีเสียงสำหรับอ่านออกเสียง ลองเปิดใน Google Chrome หรือติดตั้งเสียงภาษาอังกฤษในการตั้งค่าเครื่อง");return}
+  if(!en.length){sayMsg("เครื่องนี้ไม่มีเสียงภาษาอังกฤษ ติดตั้งได้ที่ การตั้งค่า > เวลาและภาษา > เสียงพูด (Speech)");return}
+  const voice=en.find(v=>/en-US/i.test(v.lang)&&/Google|Natural|Online/i.test(v.name))||en.find(v=>/en-US/i.test(v.lang))||en[0];
+  try{
+    speechSynthesis.cancel();
+    setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(text);u.voice=voice;u.lang=voice.lang;u.rate=.85;u.volume=1;
+      u.onstart=()=>sayMsg("🔊 กำลังอ่าน… ("+voice.name+")");u.onend=()=>sayMsg("");
+      u.onerror=e=>sayMsg("อ่านออกเสียงไม่ได้ ("+(e.error||"error")+") ลองเปิดเกมใน Google Chrome");
+      try{speechSynthesis.resume()}catch(e){}
+      speechSynthesis.speak(u);
+      setTimeout(()=>{if(!speechSynthesis.speaking&&$("#saymsg")&&/โหลด/.test($("#saymsg").textContent))sayMsg("ไม่มีเสียงออก ลองเช็กว่าเปิดลำโพงอยู่ หรือเปิดเกมใน Google Chrome")},2500);
+    },120);
+  }catch(e){sayMsg("อ่านออกเสียงไม่ได้ ลองเปิดเกมใน Google Chrome")}
+}
+
+
+async function voiceTest(){
+  const out=$("#vt");
+  if(!("speechSynthesis" in window)){out.textContent="❌ เบราว์เซอร์นี้ไม่รองรับการอ่านออกเสียง";return}
+  out.textContent="กำลังตรวจ…";const v=await getVoices();const en=v.filter(x=>/^en(-|_|$)/i.test(x.lang));
+  out.innerHTML=`เสียงทั้งหมด ${v.length} เสียง · เสียงอังกฤษ ${en.length} เสียง${en.length?": "+esc(en.slice(0,4).map(x=>x.name).join(", ")):""}<br>${v.length&&en.length?"✅ เครื่องนี้พร้อมอ่านออกเสียง กำลังลองพูด Hello, students!":"❌ เครื่องนี้ยังไม่มีเสียงภาษาอังกฤษ"}`;
+  if(en.length){try{speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance("Hello, students!");u.voice=en.find(x=>/en-US/i.test(x.lang))||en[0];u.lang=u.voice.lang;speechSynthesis.speak(u)},120)}catch(e){}}
+}
+
+boot();
+</script>
+</body>
+</html>
