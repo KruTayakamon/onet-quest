@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O-NET Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+/* Siam Adventure theme — rice green, temple gold, river blue, brick red, cream */
+:root{--rice:#7CB342;--rice2:#5E9A2C;--gold:#F2B705;--gold2:#C98F00;--river:#2B6CB0;--brick:#C8553D;--cream:#FFF6E0;--sand:#F2DDA6;--wood:#9A6B43;--ink:#3B2A1A;--muted:#7A6650;--line:#EED9A8;--bg:#EAF4E0;
+  --good:#5E9A2C;--good-soft:#EAF7DA;--bad:#C8553D;--bad-soft:#FBE6E0;
+  --display:"Mitr","Noto Sans Thai",system-ui,sans-serif;--body:"Sarabun","Noto Sans Thai",system-ui,sans-serif;color-scheme:light}
+html{font-size:16px}html.fz2{font-size:18.5px}html.fz3{font-size:21px}
+html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.06rem;line-height:1.55;min-height:100vh;
+  background-image:radial-gradient(circle at 10% 0,#F7FBEF 0,transparent 40%),radial-gradient(circle at 90% 100%,#DCEFC8 0,transparent 45%)}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance}
+h2 small,h3 small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.8em;margin-left:4px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--river);outline-offset:2px}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--cream);border-bottom:3px solid var(--line);box-shadow:0 2px 10px rgba(80,60,20,.08)}
+.top .in{max-width:1000px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-weight:600;font-size:1.3rem;color:var(--river);white-space:nowrap}.logo span{color:var(--brick)}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto;justify-content:flex-end}
+.stat{display:inline-flex;align-items:center;gap:5px;background:#fff;border:2px solid var(--line);border-radius:99px;padding:2px 12px 2px 5px;font-family:var(--display);font-weight:500;font-variant-numeric:tabular-nums}
+.stat svg{flex:none}
+.me{display:inline-flex;align-items:center;gap:4px;font-family:var(--display)}
+.ib{display:inline-grid;place-items:center;min-width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:#fff;padding:0 8px;font-family:var(--display);font-weight:600;color:var(--ink)}
+.ib:hover{border-color:var(--gold)}
+.fz{display:inline-flex;gap:4px}
+.link{background:none;border:none;color:var(--muted);text-decoration:underline;padding:4px}
+.note{font-size:.82rem;color:var(--muted)}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 16px 48px}
+/* frames & buttons */
+.frame{background:#fff;border-radius:22px;box-shadow:0 7px 0 #CFE3BC,0 14px 30px rgba(60,80,30,.13);overflow:hidden}
+.pad{padding:18px 20px}.col{display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:14px;padding:12px 20px;font-family:var(--display);font-weight:500;font-size:1.05rem;background:var(--rice);color:#fff;box-shadow:0 4px 0 var(--rice2)}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--rice2)}
+.btn.ghost{background:var(--cream);color:var(--ink);box-shadow:0 4px 0 var(--line)}
+.btn.gold{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 var(--gold2)}
+.btn.blue{background:var(--river);box-shadow:0 4px 0 #1F4F86}
+.btn.sm{padding:7px 14px;font-size:.95rem}
+.btn:disabled{opacity:.45;cursor:default}
+.subbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;background:var(--cream);border-bottom:3px solid var(--line)}
+.subbar h2{font-size:1.2rem;flex:1;min-width:0}
+.chip{border:2px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font-family:var(--display)}
+.chip small{color:var(--muted)}
+.chip.on{border-color:var(--rice2);background:var(--good-soft)}
+.stars{color:#E09A00;letter-spacing:2px}
+.hint{margin:0 0 10px;color:var(--muted)}
+/* home */
+.hero{padding:26px 20px 18px;text-align:center;background:linear-gradient(#BFE3F7,#E3F3FC)}
+.hero h1{font-size:2.2rem;font-weight:600;color:var(--river)}.hero h1 span{color:var(--brick)}
+.hero p{margin:4px 0 0;font-family:var(--display);color:var(--wood)}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:12px}
+.pick{border:3px solid transparent;background:#fff;border-radius:18px;padding:8px 8px 12px;font-family:var(--display);display:flex;flex-direction:column;align-items:center;box-shadow:0 4px 0 #E6D3A6,0 0 0 2px var(--line) inset;transition:transform .15s}
+.pick:hover{border-color:var(--gold);transform:translateY(-4px)}
+.pick b{font-weight:500}.pick span{font-size:.8rem;color:var(--muted)}
+.pinbox{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+input[type=password],select{font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+#spin{font-size:1.6rem;letter-spacing:.5em;width:9.5rem;text-align:center}
+/* bubbles */
+.bubble{background:#fff;border:3px solid var(--ink);border-radius:22px;padding:14px 18px;position:relative;min-width:0}
+.bubble p{margin:0}.bubble .en{font-family:var(--display);font-size:1.15rem}.bubble .thx{color:var(--muted);margin-top:4px}
+/* map */
+.mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 18px;background:var(--cream);border-bottom:3px solid var(--line)}
+.mapbar h2{font-size:1.3rem}
+.mapsvg svg{display:block;width:100%;height:auto}
+.mapsvg .bob{animation:bob 3.6s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
+.mapsvg .isle{cursor:pointer}.mapsvg .isle.locked{cursor:not-allowed}
+.mapsvg .isle:not(.locked):hover .bob{filter:brightness(1.08)}
+.mapsvg #boat{transition:transform 1.6s cubic-bezier(.45,.05,.35,1)}
+.face{transition:transform .35s;transform-box:fill-box;transform-origin:center}
+.rock{animation:rock 2.2s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 80%}
+@keyframes rock{from{transform:rotate(-2.5deg) translateY(-2px)}to{transform:rotate(2.5deg) translateY(2px)}}
+.spin{animation:spin 5s linear infinite;transform-box:fill-box;transform-origin:center}@keyframes spin{to{transform:rotate(360deg)}}
+.flag{animation:flag 1.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:left center}@keyframes flag{from{transform:skewY(-6deg) scaleX(.94)}to{transform:skewY(6deg) scaleX(1)}}
+.drift{animation:drift 9s linear infinite}@keyframes drift{to{transform:translateX(120px)}}
+.glow{animation:glow 3s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes glow{to{transform:scale(1.18);opacity:.12}}
+.cloudA{animation:cloudA 26s ease-in-out infinite alternate}.cloudB{animation:cloudA 32s ease-in-out infinite alternate-reverse}@keyframes cloudA{to{transform:translateX(60px)}}
+/* island page */
+.banner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;align-items:center;padding:14px 18px;background:linear-gradient(180deg,#BFE3F7 0,#E3F3FC 55%,#36B8F7 55%,#1F94E6 100%)}
+.bisle svg{display:block;width:100%;height:auto}
+.npc{display:flex;gap:10px;align-items:center}
+.npcfig{display:flex;flex-direction:column;align-items:center;font-family:var(--display);font-size:.85rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);flex:none}
+.npcfig svg{animation:hop 1.6s ease-in-out infinite alternate}
+.npcfig b{background:rgba(59,42,26,.78);border-radius:99px;padding:1px 10px;font-weight:500;text-shadow:none;white-space:nowrap}
+.npc .bubble:before{content:"";position:absolute;left:-16px;top:30px;border:9px solid transparent;border-right:14px solid var(--ink)}
+.std{font-family:var(--display);color:var(--wood)}
+.goalbox{background:var(--cream);border:2px dashed var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.goalbox b{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:500}
+.goal{display:flex;gap:8px;flex-wrap:wrap}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.lvl{position:relative;border:none;text-align:left;padding:16px 16px 14px;border-radius:16px;background:linear-gradient(#C99A62,#A87A45);color:#fff;box-shadow:0 5px 0 #7A5530;display:flex;flex-direction:column;gap:4px;font-family:var(--display)}
+.lvl:before{content:"";position:absolute;inset:6px;border:2px dashed rgba(255,246,224,.5);border-radius:12px;pointer-events:none}
+.lvl h3{font-size:1.25rem}.lvl .stars{color:#FFE27A;font-size:1.2rem}.lvl .note{color:#FFF1D6;font-family:var(--body)}
+.lvl.on{background:linear-gradient(#8CC152,#5E9A2C);box-shadow:0 5px 0 #3F6E1C}
+.lvl.locked{background:linear-gradient(#CFC6B5,#B5AB98);box-shadow:0 5px 0 #968C7A;cursor:default}
+.lvl:not(.locked):hover{transform:translateY(-2px)}
+/* question */
+.dots{display:flex;gap:6px}.dots i{width:13px;height:13px;border-radius:50%;background:#E6D9BC;border:2px solid #fff}
+.dots i.ok{background:var(--rice)}.dots i.no{background:var(--brick)}.dots i.cur{background:var(--gold);transform:scale(1.25)}
+.q{display:grid;grid-template-columns:210px minmax(0,1fr);gap:18px;padding:20px 20px 26px;overflow:hidden;background:linear-gradient(180deg,#BFE3F7 0,#E3F3FC 62%,#36B8F7 62%,#1F94E6 100%);position:relative}
+.dock{position:relative;display:flex;align-items:flex-end;justify-content:center;min-height:200px}
+.dock .water{position:absolute;bottom:-26px;left:-20px;width:calc(100% + 20px);height:110px}
+.hero-c{position:relative;z-index:1;margin-bottom:34px;animation:hop 1.2s ease-in-out infinite alternate}
+.hero-c.happy{animation:jump .5s ease-out 2}.hero-c.oops{animation:wobble .45s ease-in-out}
+@keyframes hop{to{transform:translateY(-6px)}}@keyframes jump{50%{transform:translateY(-22px) rotate(-4deg)}}
+@keyframes wobble{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+.qb{align-self:center;display:flex;flex-direction:column;gap:6px}
+.qb:before{content:"";position:absolute;left:-18px;top:44px;border:10px solid transparent;border-right:16px solid var(--ink)}
+.qb .ctx{white-space:pre-line;font-size:1.15rem}.qb .ctx b{font-weight:600}
+.qb .ask{font-family:var(--display);font-weight:500;font-size:1.3rem;color:var(--river)}
+.pic img{display:block;max-width:360px;width:100%;height:auto;border-radius:12px;border:2px solid var(--line)}
+.em{font-size:3rem;line-height:1}
+.lrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.listen{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:99px;background:var(--river);color:#fff;font-family:var(--display);font-weight:500;font-size:1.1rem;padding:9px 20px 9px 14px;box-shadow:0 4px 0 #1F4F86}
+.listen small{opacity:.85;font-size:.8em}
+.listen.slow{background:#fff;color:var(--river);border:2px solid var(--river);box-shadow:none;padding:6px 14px;font-size:.95rem}
+.listen.sm{font-size:.95rem;padding:6px 14px 6px 10px;margin-top:8px}
+.listen:active{transform:translateY(3px);box-shadow:0 1px 0 #1F4F86}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px;background:var(--sand)}
+.opt{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:1.12rem;background:#fff;border:3px solid #E2C98A;border-radius:16px;padding:12px 14px;box-shadow:0 5px 0 #D9BC77;text-align:left;min-height:64px}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px)}
+.opt .k{flex:none;width:2.2rem;height:2.2rem;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:600}
+.k0{background:var(--rice2)}.k1{background:var(--river)}.k2{background:var(--brick)}.k3{background:#B0821B}
+.opt.ok{border-color:var(--rice2);background:var(--good-soft);box-shadow:0 5px 0 var(--rice2)}
+.opt.no{border-color:var(--brick);background:var(--bad-soft);box-shadow:0 5px 0 var(--brick);animation:shake .4s}
+.opt:disabled{cursor:default}.opt:disabled:not(.ok):not(.no){opacity:.55}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.fb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;color:#fff;font-family:var(--display)}
+.fb.ok{background:var(--rice)}.fb.no{background:var(--brick)}
+.fb b{font-size:1.25rem}.fb .en{flex-basis:100%;font-family:var(--body);font-size:1.05rem}
+.fb .tag{margin-left:auto;background:#fff;color:var(--ink);border-radius:99px;padding:3px 14px;font-weight:500}
+.th{display:flex;gap:8px;align-items:flex-start;background:var(--cream);border-top:3px dashed var(--line);padding:12px 20px}
+.thbtn{margin:10px 20px 0}
+.next{padding:12px 20px 0}
+.bar{height:14px;background:#E8DBBB;border-radius:99px;overflow:hidden;margin:14px 20px 18px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#F7C948);transition:width .5s}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.confetti i{position:absolute;top:-14px;width:10px;height:14px;border-radius:2px;animation:fall 1.6s linear forwards}
+@keyframes fall{to{top:110%;transform:rotate(600deg)}}
+/* results */
+.res{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.bigstars{display:flex;gap:6px}.bigstars svg{width:56px;height:56px}
+.chestbtn{border:none;background:none;padding:0;width:min(220px,100%);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--display);color:var(--wood)}
+.chestbtn svg{width:100%;height:auto}
+.chestbtn.shut svg{animation:wiggle 1.4s ease-in-out infinite}
+@keyframes wiggle{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-4deg)}86%{transform:rotate(4deg)}94%{transform:rotate(-2deg)}}
+.chestbtn.open svg{animation:popin .45s ease-out}
+@keyframes popin{from{transform:scale(.85)}to{transform:none}}
+.gain{font-family:var(--display);font-size:1.6rem;color:var(--gold2);display:flex;align-items:center;gap:6px}
+.msg{border-radius:14px;padding:10px 14px}.msg.ok{background:var(--good-soft)}.msg.no{background:var(--bad-soft)}
+.feel{display:flex;gap:10px;flex-wrap:wrap}.feel button{border:3px solid var(--line);background:#fff;border-radius:16px;padding:4px 10px 6px;display:flex;flex-direction:column;align-items:center;font-family:var(--display);font-size:.85rem}
+.feel button.on{border-color:var(--rice2);background:var(--good-soft)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.badge{border:2px solid var(--line);border-radius:16px;padding:12px;text-align:center;background:#fff;display:flex;flex-direction:column;align-items:center;gap:2px}
+.badge b{font-family:var(--display);font-weight:500}.badge.off{background:#FAF7F0}
+/* shop */
+.shop{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px;padding:18px 20px}
+.preview{background:radial-gradient(circle at 50% 45%,#FFF6E0 0,#FBE9C2 70%);border-radius:20px;padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.preview svg{max-width:100%;height:auto}
+.minis{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.mini{border:2px solid var(--line);background:#fff;border-radius:12px;padding:2px 4px;display:flex;flex-direction:column;align-items:center;font-size:.7rem}
+.mini.on{border-color:var(--gold);background:var(--cream)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-content:start}
+.item{border:3px solid var(--line);border-radius:18px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;background:#fff}
+.item b{font-family:var(--display);font-weight:500}.item span{color:var(--muted);font-size:.9rem;margin-bottom:6px}
+.item.on{border-color:var(--rice2);background:var(--good-soft)}
+/* tutorial */
+.tut{position:fixed;inset:0;z-index:50;background:rgba(30,40,20,.55);display:grid;place-items:center;padding:16px}
+.tbox{background:#fff;border-radius:24px;max-width:520px;width:100%;box-shadow:0 8px 0 #CFE3BC;overflow:hidden;max-height:calc(100vh - 32px);overflow-y:auto}
+.tart{background:linear-gradient(#BFE3F7,#E3F3FC);display:flex;justify-content:center;align-items:flex-end;gap:8px;padding:14px;min-height:150px}
+.tart svg{max-width:100%;height:auto}
+.tbody{padding:16px 20px 18px;display:flex;flex-direction:column;gap:10px}
+.tbody h2{font-size:1.35rem}.tbody p{margin:0}
+.tdots{display:flex;gap:6px}.tdots i{width:10px;height:10px;border-radius:50%;background:#E6D9BC}.tdots i.on{background:var(--gold)}
+/* teacher / expert */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.82rem}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.82rem;font-weight:600}
+.p1{background:var(--bad-soft);color:var(--bad)}.p2{background:#FDF0D3;color:var(--ink)}.p3{background:var(--good-soft);color:var(--good)}
+.pop{animation:popf .35s ease-out}@keyframes popf{from{transform:scale(.97);opacity:.6}to{transform:none;opacity:1}}
+@media (max-width:700px){
+  .res>.col:last-child{order:-1}.top{position:static}.me>span,#sync{display:none}.top .in{padding:8px 12px}.wrap{padding:12px 10px 40px}
+  .q{grid-template-columns:1fr;padding:14px}.dock{min-height:150px}.hero-c svg{width:120px;height:120px}
+  .qb:before,.npc .bubble:before{display:none}.opts{grid-template-columns:1fr;padding:14px}
+  .banner{grid-template-columns:1fr}.res{grid-template-columns:1fr}.shop{grid-template-columns:1fr}
+  .npc{flex-direction:column;align-items:stretch}.npcfig{flex-direction:row;gap:8px}.npcfig svg{width:80px;height:80px}
+}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in"><div class="logo">O-NET <span>Quest</span></div><div class="who" id="who"></div></div></header>
+<div class="wrap"><main id="app"></main></div>
+
+<script>
+const SIAM=(function(){
+
+const C = {
+  ink: "#3B2A1A", blush: "#F49A8C", white: "#FFFFFF",
+};
+function eyes(x1, x2, y, mood) {
+  if (mood === "happy") return `<path d="M${x1-5},${y} q5,-6 10,0" stroke="${C.ink}" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M${x2-5},${y} q5,-6 10,0" stroke="${C.ink}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;
+  if (mood === "oops") return `<circle cx="${x1}" cy="${y}" r="4.2" fill="${C.ink}"/><circle cx="${x2}" cy="${y}" r="4.2" fill="${C.ink}"/><circle cx="${x1+1.5}" cy="${y-1.5}" r="1.4" fill="#fff"/><circle cx="${x2+1.5}" cy="${y-1.5}" r="1.4" fill="#fff"/>`;
+  return `<ellipse cx="${x1}" cy="${y}" rx="4.6" ry="5.6" fill="${C.ink}"/><ellipse cx="${x2}" cy="${y}" rx="4.6" ry="5.6" fill="${C.ink}"/><circle cx="${x1+1.6}" cy="${y-2}" r="1.7" fill="#fff"/><circle cx="${x2+1.6}" cy="${y-2}" r="1.7" fill="#fff"/>`;
+}
+function mouth(x, y, mood) {
+  if (mood === "happy") return `<path d="M${x-7},${y} q7,8 14,0" fill="#E2574C" stroke="${C.ink}" stroke-width="2" stroke-linejoin="round"/>`;
+  if (mood === "oops") return `<ellipse cx="${x}" cy="${y+2}" rx="3.2" ry="4" fill="${C.ink}"/>`;
+  return `<path d="M${x-5},${y} q5,5 10,0" stroke="${C.ink}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+}
+const blush = (x1, x2, y) => `<ellipse cx="${x1}" cy="${y}" rx="6" ry="3.6" fill="${C.blush}" opacity=".75"/><ellipse cx="${x2}" cy="${y}" rx="6" ry="3.6" fill="${C.blush}" opacity=".75"/>`;
+
+const K = { ink: "#2B2340", white: "#FFFFFF", blush: "#FF7E9E" };
+let __u = 0;
+const uid = (p) => p + (++__u);
+function ball(cx, cy, r, base, shade, light) {
+  const id = uid("c");
+  return `<clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath><circle cx="${cx}" cy="${cy}" r="${r}" fill="${shade}"/><g clip-path="url(#${id})"><circle cx="${cx - r * .17}" cy="${cy - r * .19}" r="${r * .96}" fill="${base}"/></g>
+  ${light ? `<ellipse cx="${cx - r * .42}" cy="${cy - r * .5}" rx="${r * .22}" ry="${r * .13}" fill="${light}" transform="rotate(-30 ${cx - r * .42} ${cy - r * .5})"/>` : ""}`;
+}
+function shp(d, base, shade, shadeD) {
+  const id = uid("b");
+  return `<clipPath id="${id}"><path d="${d}"/></clipPath><path d="${d}" fill="${base}"/><g clip-path="url(#${id})"><path d="${shadeD}" fill="${shade}"/></g>`;
+}
+function eyes2(x1, x2, y, m, s = 1) {
+  if (m === "happy") return [x1, x2].map(x => `<path d="M${x - 6 * s},${y + 1} q${6 * s},${-10 * s} ${12 * s},0 q${-6 * s},${-5 * s} ${-12 * s},0z" fill="${K.ink}"/>`).join("");
+  if (m === "oops") return [x1, x2].map(x => `<circle cx="${x}" cy="${y}" r="${6.5 * s}" fill="#fff"/><circle cx="${x}" cy="${y + 1}" r="${2.6 * s}" fill="${K.ink}"/>`).join("") + `<path d="M${x2 + 9},${y - 10} q4,6 0,9 q-4,-3 0,-9z" fill="#5EC8FF"/>`;
+  return [x1, x2].map(x => `<ellipse cx="${x}" cy="${y}" rx="${6 * s}" ry="${7 * s}" fill="#fff"/><ellipse cx="${x + 1}" cy="${y + 1}" rx="${4 * s}" ry="${4.8 * s}" fill="${K.ink}"/><circle cx="${x + 2.6 * s}" cy="${y - 1.6 * s}" r="${1.6 * s}" fill="#fff"/>`).join("");
+}
+function mouth2(x, y, m) {
+  if (m === "happy") return `<path d="M${x - 8},${y} h16 q0,10 -8,10 q-8,0 -8,-10z" fill="#7A1F3D"/><path d="M${x - 4.5},${y + 7} q4.5,-4 9,0 q-4.5,3 -9,0z" fill="#FF7A8A"/>`;
+  if (m === "oops") return `<ellipse cx="${x}" cy="${y + 3}" rx="3.6" ry="4.4" fill="#7A1F3D"/>`;
+  return `<path d="M${x - 5},${y} q5,6 10,0 q-5,2.5 -10,0z" fill="#7A1F3D"/>`;
+}
+const cheeks = (x1, x2, y) => `<ellipse cx="${x1}" cy="${y}" rx="5.5" ry="3.4" fill="${K.blush}" opacity=".7"/><ellipse cx="${x2}" cy="${y}" rx="5.5" ry="3.4" fill="${K.blush}" opacity=".7"/>`;
+const spark = (pts) => pts.map(([x, y, s]) => `<path transform="translate(${x},${y}) scale(${s || 1})" d="M0,-7 q1.2,5.8 7,7 q-5.8,1.2 -7,7 q-1.2,-5.8 -7,-7 q5.8,-1.2 7,-7z" fill="#FFD23F"/>`).join("");
+const ground = (rx = 30) => `<ellipse cx="60" cy="106" rx="${rx}" ry="5" fill="#2B2340" opacity=".14"/>`;
+
+const CHARS2 = {
+  elephant: { name: "Elephant", th: "ช้าง", hat: [60, 24], neck: [60, 84], draw: (m) => {
+    const B = "#62A8FF", S = "#3F84E0", L = "#A9D3FF";
+    const earL = `<g transform="rotate(${m === "happy" ? -14 : 0} 20 56)">${shp("M20,30 a20,25 0 1 0 0.1,0z", B, S, "M-4,58 q24,18 48,0 v30 h-48z")}<ellipse cx="22" cy="57" rx="12" ry="15" fill="#FF9EC0"/><ellipse cx="25" cy="62" rx="8" ry="10" fill="#F57FA8"/></g>`;
+    const earR = `<g transform="rotate(${m === "happy" ? 14 : 0} 100 56)">${shp("M100,30 a20,25 0 1 0 0.1,0z", B, S, "M76,58 q24,18 48,0 v30 h-48z")}<ellipse cx="98" cy="57" rx="12" ry="15" fill="#FF9EC0"/><ellipse cx="95" cy="62" rx="8" ry="10" fill="#F57FA8"/></g>`;
+    const trunk = m === "happy" ? "M60,64 q12,-2 20,-14 q8,-12 6,-28" : m === "oops" ? "M60,64 q0,14 -1,24 q0,6 4,7" : "M60,64 q-2,14 6,22 q6,5 10,-1";
+    const tip = m === "happy" ? `<ellipse cx="86" cy="21" rx="7" ry="4.6" fill="${L}"/><ellipse cx="86" cy="20.5" rx="2.8" ry="1.4" fill="${S}"/>` : "";
+    const mo = m === "happy" ? mouth2(60, 72, m) : m === "oops" ? `<ellipse cx="46" cy="78" rx="3.4" ry="4.2" fill="#7A1F3D"/>` : `<path d="M41,76 q5,6 11,1 q-5,2 -11,-1z" fill="#7A1F3D"/>`;
+    return `${ground()}${earL}${earR}${shp("M34,91 a13,13 0 0 1 13,-13 h26 a13,13 0 0 1 13,13 v1 a13,13 0 0 1 -13,13 h-26 a13,13 0 0 1 -13,-13z", B, S, "M60,78 h40 v30 h-40z")}
+    ${ball(60, 54, 33, B, S, L)}${mo}
+    <path d="${trunk}" fill="none" stroke="${S}" stroke-width="14" stroke-linecap="round"/><path d="${trunk}" fill="none" stroke="${B}" stroke-width="10" stroke-linecap="round" transform="translate(-1.5,-1.5)"/>${tip}
+    ${eyes2(44, 76, 47, m)}${cheeks(36, 84, 61)}${m === "happy" ? spark([[104, 12], [112, 32, .6]]) : ""}
+    <path d="M44,19 q16,-13 32,0 q-16,7 -32,0z" fill="#FFC928"/><path d="M60,22 q16,-1 16,-3 q-16,7 -32,0 q8,3 16,3z" fill="#F0A400"/><circle cx="60" cy="13" r="4.2" fill="#FF4F5E"/>`;
+  } },
+  buffalo: { name: "Buffalo", th: "ควาย", hat: [60, 26], neck: [60, 87], draw: (m) => {
+    const B = "#6E7AA8", S = "#4F5A86", L = "#97A2CC";
+    const hornL = m === "happy" ? "M30,36 q-26,-14 -16,-34 q4,16 24,22z" : m === "oops" ? "M26,44 q-24,0 -22,-20 q8,12 24,12z" : "M26,40 q-22,-6 -18,-28 q8,14 26,16z";
+    const hornR = m === "happy" ? "M90,36 q26,-14 16,-34 q-4,16 -24,22z" : m === "oops" ? "M94,44 q24,0 22,-20 q-8,12 -24,12z" : "M94,40 q22,-6 18,-28 q-8,14 -26,16z";
+    const ear = m === "oops" ? [24, 60, -40] : [22, 52, -20];
+    return `${ground()}<path d="${hornL}" fill="#FFF0CF"/><path d="${hornR}" fill="#FFF0CF"/><path d="${hornR}" fill="#E8CF97" transform="translate(2,2)" opacity=".8"/>
+    ${shp("M34,91 a13,13 0 0 1 13,-13 h26 a13,13 0 0 1 13,13 v1 a13,13 0 0 1 -13,13 h-26 a13,13 0 0 1 -13,-13z", B, S, "M60,78 h40 v30 h-40z")}
+    <ellipse cx="${ear[0]}" cy="${ear[1]}" rx="13" ry="7.5" fill="${S}" transform="rotate(${ear[2]} ${ear[0]} ${ear[1]})"/><ellipse cx="${120 - ear[0]}" cy="${ear[1]}" rx="13" ry="7.5" fill="${S}" transform="rotate(${-ear[2]} ${120 - ear[0]} ${ear[1]})"/>
+    ${ball(60, 56, 33, B, S, L)}<path d="M50,26 q10,-10 20,0 q-10,5 -20,0z" fill="${L}"/>
+    <ellipse cx="60" cy="76" rx="21" ry="13" fill="#FFB8CF"/><path d="M39,78 q21,14 42,0 q-2,12 -21,12 q-19,0 -21,-12z" fill="#F296B4"/>
+    <ellipse cx="52" cy="73" rx="3" ry="2.4" fill="#7A1F3D"/><ellipse cx="68" cy="73" rx="3" ry="2.4" fill="#7A1F3D"/>
+    ${m === "happy" ? `<path d="M53,80 h14 q0,7 -7,7 q-7,0 -7,-7z" fill="#7A1F3D"/>` : m === "oops" ? `<ellipse cx="60" cy="82" rx="2.8" ry="3.4" fill="#7A1F3D"/>` : `<path d="M55,80 q5,4 10,0 q-5,2 -10,0z" fill="#7A1F3D"/>`}
+    ${eyes2(45, 75, 51, m)}${cheeks(35, 85, 62)}${m === "happy" ? spark([[12, 10], [108, 10], [112, 30, .6]]) : ""}`;
+  } },
+  cat: { name: "Cat", th: "แมว", hat: [60, 27], neck: [60, 89], draw: (m) => {
+    const B = "#FFE6B3", S = "#F2C580", P = "#8B5A3C", L = "#FFF6DD";
+    const tail = m === "happy" ? "M84,92 q26,-6 24,-38 q-1,-12 -10,-12" : m === "oops" ? "M86,98 q18,6 26,-2" : "M86,92 q22,-2 18,-24";
+    const ears = m === "oops" ? `<path d="M30,42 l-16,-18 l30,6z" fill="${P}"/><path d="M90,42 l16,-18 l-30,6z" fill="${P}"/>` : `<path d="M28,40 l-5,-28 l28,15z" fill="${P}"/><path d="M92,40 l5,-28 l-28,15z" fill="${P}"/><path d="M30,35 l-3,-15 l14,8z" fill="#FF9EC0"/><path d="M90,35 l3,-15 l-14,8z" fill="#FF9EC0"/>`;
+    const eyeC = m === "idle" ? [47, 73].map(x => `<ellipse cx="${x}" cy="55" rx="6" ry="7" fill="#fff"/><ellipse cx="${x + .5}" cy="56" rx="4.4" ry="5.2" fill="#3FA6FF"/><ellipse cx="${x + .5}" cy="56" rx="1.8" ry="4.4" fill="${K.ink}"/><circle cx="${x + 2.4}" cy="53" r="1.6" fill="#fff"/>`).join("") : eyes2(47, 73, 55, m);
+    return `${ground()}${ears}<path d="${tail}" fill="none" stroke="${P}" stroke-width="8" stroke-linecap="round"/>
+    ${shp("M36,91 a13,13 0 0 1 13,-13 h22 a13,13 0 0 1 13,13 v1 a13,13 0 0 1 -13,13 h-22 a13,13 0 0 1 -13,-13z", B, S, "M60,78 h40 v30 h-40z")}
+    ${ball(60, 58, 33, B, S, L)}<ellipse cx="60" cy="68" rx="19" ry="15" fill="${P}" opacity=".85"/>
+    ${eyeC}<path d="M56.5,63 h7 l-3.5,3.6z" fill="#FF7A9C"/>${cheeks(35, 85, 67)}
+    <path d="M24,66 h13 M25,71 h12 M83,66 h13 M83,71 h12" stroke="${P}" stroke-width="2" stroke-linecap="round" opacity=".55"/>${mouth2(60, 70, m)}${m === "happy" ? spark([[102, 30], [16, 14, .7]]) : ""}`;
+  } },
+  hornbill: { name: "Hornbill", th: "นกเงือก", hat: [52, 22], neck: [60, 70], draw: (m) => {
+    const B = "#3A3363", S = "#28224A", L = "#5C548F";
+    const wings = m === "happy" ? `<path d="M34,72 q-26,-10 -30,-42 q16,8 22,4 q2,10 14,16z" fill="${S}"/><path d="M86,72 q26,-10 30,-42 q-16,8 -22,4 q-2,10 -14,16z" fill="${S}"/><path d="M8,36 q8,6 16,4 l2,6 q-10,2 -16,-4z M112,36 q-8,6 -16,4 l-2,6 q10,2 16,-4z" fill="#fff" opacity=".9"/>`
+      : m === "oops" ? `<path d="M34,78 q-12,14 -4,26 q8,-6 12,-14z" fill="${S}"/><path d="M86,78 q12,14 4,26 q-8,-6 -12,-14z" fill="${S}"/>`
+      : `<path d="M32,74 q-14,10 -6,26 q10,-6 14,-16z" fill="${S}"/><path d="M88,74 q14,10 6,26 q-10,-6 -14,-16z" fill="${S}"/>`;
+    const beak = m === "happy" ? `<path d="M70,46 q30,-8 40,6 q-22,2 -40,2z" fill="#FFC928"/><path d="M70,52 q24,2 34,8 q-18,4 -34,-2z" fill="#F0A400"/><path d="M72,50 q16,0 26,4 l-26,0z" fill="#7A1F3D"/>`
+      : m === "oops" ? `<path d="M70,48 q28,0 34,16 q-20,0 -34,-8z" fill="#FFC928"/>` : `<path d="M70,46 q30,-6 40,10 q-22,6 -40,4z" fill="#FFC928"/><path d="M72,54 q20,4 38,2 q-22,6 -40,4z" fill="#F0A400"/>`;
+    const eye = m === "happy" ? `<path d="M42,50 q6,-10 12,0 q-6,-5 -12,0z" fill="${K.ink}"/>` : m === "oops" ? `<circle cx="48" cy="48" r="6.5" fill="#fff"/><circle cx="48" cy="49" r="2.6" fill="${K.ink}"/>` : `<ellipse cx="48" cy="48" rx="6" ry="7" fill="#fff"/><ellipse cx="49" cy="49" rx="4" ry="4.8" fill="${K.ink}"/><circle cx="50.6" cy="46.4" r="1.6" fill="#fff"/>`;
+    return `<ellipse cx="60" cy="106" rx="28" ry="5" fill="#2B2340" opacity=".14"/>${shp("M60,56 a28,24 0 1 0 0.1,0z", B, S, "M60,80 h40 v40 h-40z")}<ellipse cx="60" cy="86" rx="16" ry="14" fill="#fff"/><path d="M60,72 a16,14 0 0 1 16,14 a16,14 0 0 1 -6,11 q4,-12 -10,-25z" fill="#E4E0F2"/>
+    ${wings}${ball(60, 48, 28, B, S, L)}<circle cx="48" cy="48" r="10" fill="#9EE1FF"/>${beak}<path d="M68,34 q20,-12 34,0 q-16,4 -34,6z" fill="#FF5A3C"/><path d="M68,40 q18,-2 34,-6 q-14,1 -34,0z" fill="#D63A22"/>
+    ${eye}<ellipse cx="42" cy="62" rx="5" ry="3" fill="${K.blush}" opacity=".75"/>${m === "oops" ? `<path d="M30,34 q4,6 0,9 q-4,-3 0,-9z" fill="#5EC8FF"/>` : ""}${m === "happy" ? spark([[60, 8], [100, 18, .6]]) : ""}`;
+  } },
+  squirrel: { name: "Squirrel", th: "กระรอก", hat: [56, 27], neck: [56, 84], draw: (m) => {
+    const B = "#FF9640", S = "#E06A1C", L = "#FFC08A";
+    const tail = m === "oops" ? `<path d="M84,100 q30,4 32,-26 q0,-16 -14,-18 q6,14 -4,26 q-6,8 -14,14z" fill="${S}"/>` : `<path d="M88,98 q34,-8 26,-46 q-6,-24 -26,-14 q14,10 6,28 q-6,14 -12,22z" fill="${B}"/><path d="M112,54 q4,24 -18,42 q22,-6 22,-30z" fill="${S}"/><path d="M98,44 q9,12 3,30" stroke="#FFD2A6" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    const acorn = m === "happy" ? `<g transform="translate(56,92)"><ellipse rx="10" ry="12" fill="#C9772F"/><path d="M0,-12 a10,12 0 0 1 10,12 a10,12 0 0 1 -10,12 q8,-12 0,-24z" fill="#A65A1C"/><path d="M-11,-6 q11,-12 22,0 q-11,5 -22,0z" fill="#7A4A2A"/><rect x="-1.2" y="-17" width="2.6" height="6" rx="1.2" fill="#7A4A2A"/></g><ellipse cx="44" cy="92" rx="6" ry="5" fill="${B}"/><ellipse cx="68" cy="92" rx="6" ry="5" fill="${B}"/>` : "";
+    return `${ground()}${tail}<path d="M33,36 l-4,-20 l17,10z" fill="${S}"/><path d="M79,36 l4,-20 l-17,10z" fill="${S}"/><path d="M34,32 l-2,-10 l9,6z" fill="#FF9EC0"/><path d="M78,32 l2,-10 l-9,6z" fill="#FF9EC0"/>
+    ${shp("M32,91 a13,13 0 0 1 13,-13 h22 a13,13 0 0 1 13,13 v1 a13,13 0 0 1 -13,13 h-22 a13,13 0 0 1 -13,-13z", B, S, "M56,78 h40 v30 h-40z")}<ellipse cx="56" cy="91" rx="13" ry="9" fill="#FFE2C2"/>
+    ${ball(56, 56, 31, B, S, L)}<ellipse cx="56" cy="67" rx="18" ry="13" fill="#FFE2C2"/>
+    ${eyes2(43, 69, 52, m)}<ellipse cx="56" cy="62" rx="3.6" ry="2.8" fill="${K.ink}"/>${mouth2(56, 68, m)}${cheeks(34, 78, 63)}${acorn}${m === "happy" ? spark([[96, 14], [18, 14, .7]]) : ""}`;
+  } },
+};
+
+const CHARS = CHARS2;
+const SHOP = [
+  { k: "ngob", slot: "hat", en: "Farmer Hat", th: "งอบ", price: 20, draw: () => `<path d="M-36,6 L0,-19 L36,6 q-36,9 -72,0z" fill="#FFD27A"/><path d="M0,-19 L36,6 q-18,5 -36,5z" fill="#E9AE45"/><path d="M-30,3 q30,9 60,0 v4 q-30,9 -60,0z" fill="#FF4F5E"/><circle cy="-19" r="2.6" fill="#B5652B"/>` },
+  { k: "pkm", slot: "neck", en: "Checked Scarf", th: "ผ้าขาวม้า", price: 25, draw: () => `<defs><pattern id="pkmP" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#FF4F5E"/><rect width="4" height="8" fill="#3F84E0"/><rect width="8" height="3" fill="#fff" opacity=".45"/></pattern></defs><path d="M-28,-6 q28,12 56,0 v10 q-28,12 -56,0z" fill="url(#pkmP)"/><path d="M-28,0 q28,12 56,0 v4 q-28,12 -56,0z" fill="#2B2340" opacity=".18"/><path d="M14,4 l10,16 l-9,2 l-6,-14z" fill="url(#pkmP)"/>` },
+  { k: "malai", slot: "neck", en: "Flower Garland", th: "พวงมาลัย", price: 30, draw: () => { let o = ""; for (let i = 0; i <= 10; i++) { const a = Math.PI * (i / 10), x = -26 * Math.cos(a), y = -6 + 12 * Math.sin(a); o += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.6" fill="${i % 2 ? "#FFFFFF" : "#FFC928"}"/><circle cx="${(x + 1.3).toFixed(1)}" cy="${(y + 1.3).toFixed(1)}" r="2.4" fill="${i % 2 ? "#E4E0F2" : "#F0A400"}"/>`; } return o + `<path d="M-3,13 l-2,13 h3 l1,-12z M3,13 l2,13 h-3 l-1,-12z" fill="#FFC928"/><circle cx="0" cy="8" r="6.4" fill="#FF4F5E"/><circle cx="1.5" cy="9.5" r="3.4" fill="#D93347"/><circle cx="-1.6" cy="6.4" r="1.6" fill="#FF9EC0"/>`; } },
+  { k: "crown", slot: "hat", en: "Flower Crown", th: "มงกุฎดอกไม้", price: 35, draw: () => { let o = `<path d="M-31,3 q31,-14 62,0 v4 q-31,-13 -62,0z" fill="#4FA82A"/>`; const c = ["#FF9EC0", "#FFC928", "#FF4F5E", "#FFFFFF", "#FF9EC0", "#FFC928", "#FF4F5E"]; for (let i = 0; i < 7; i++) { const x = -27 + i * 9, y = -3 - 6 * Math.sin(Math.PI * i / 6); o += `<g transform="translate(${x},${y.toFixed(1)})">${[0, 72, 144, 216, 288].map(a => `<ellipse rx="2.8" ry="4.6" cy="-3.6" fill="${c[i]}" transform="rotate(${a})"/>`).join("")}<circle r="2.2" fill="#F0A400"/></g>`; } return o; } },
+  { k: "chada", slot: "hat", en: "Golden Headdress", th: "ชฎา", price: 60, draw: () => `<path d="M-22,6 h44 l-4,-10 h-36z" fill="#FFC928"/><path d="M0,6 h22 l-4,-10 h-18z" fill="#F0A400"/><path d="M-16,-4 h32 l-5,-12 h-22z" fill="#FFD84F"/><path d="M0,-4 h16 l-5,-12 h-11z" fill="#F0A400"/><path d="M-10,-16 h20 l-4,-12 h-12z" fill="#FFE27A"/><path d="M0,-16 h10 l-4,-12 h-6z" fill="#F0A400"/><path d="M-5,-28 h10 l-5,-18z" fill="#FFC928"/><path d="M0,-28 h5 l-5,-18z" fill="#F0A400"/><circle cy="1" r="3.2" fill="#FF4F5E"/><circle cx="-12" cy="1" r="2.2" fill="#3F84E0"/><circle cx="12" cy="1" r="2.2" fill="#3F84E0"/><circle cy="-10" r="2.3" fill="#4FA82A"/>` },
+];
+function wearSVG(key, wear) {
+  if (!wear) return "";
+  const c = CHARS[key]; let o = "";
+  ["neck", "hat"].forEach(slot => { const it = SHOP.find(s => s.k === wear[slot]); if (it) { const [x, y] = c[slot]; o += `<g transform="translate(${x},${y})">${it.draw()}</g>`; } });
+  return o;
+}
+const charArt = (key, mood, wear) => (CHARS[key] || CHARS.elephant).draw(mood || "idle") + wearSVG(CHARS[key] ? key : "elephant", wear);
+function charSVG(key, mood = "idle", size = 120, wear) {
+  return `<svg viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true" focusable="false">${charArt(key, mood, wear)}</svg>`;
+}
+function itemSVG(k, size = 70) {
+  const it = SHOP.find(s => s.k === k);
+  return `<svg viewBox="-40 -48 80 80" width="${size}" height="${size}" aria-hidden="true">${it ? it.draw() : ""}</svg>`;
+}
+function chestSVG(open) {
+  const lid = open
+    ? `<path d="M24,52 L36,14 h88 L136,52z" fill="#B5652B"/><path d="M80,14 h44 L136,52 h-56z" fill="#93501E"/><path d="M30,40 L40,18 h80 L130,40 l-3,6 L118,24 h-76 l-9,22z" fill="#FFC928"/>`
+    : `<path d="M20,58 q0,-34 60,-34 q60,0 60,34z" fill="#C9772F"/><path d="M80,24 q60,0 60,34 h-60z" fill="#A65A1C"/><rect x="45" y="27" width="10" height="31" fill="#FFC928"/><rect x="105" y="27" width="10" height="31" fill="#F0A400"/>`;
+  const glow = open ? `<ellipse cx="80" cy="58" rx="52" ry="20" fill="#FFE27A"/>${[[58, 52], [72, 46], [88, 48], [102, 54], [80, 56]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="6" fill="#FFC928"/><ellipse cx="${x + 2}" cy="${y + 2}" rx="6" ry="3.4" fill="#F0A400"/>`).join("")}${spark([[40, 30], [124, 26], [80, 18, 1.3]])}` : "";
+  return `<svg viewBox="0 0 160 130" aria-hidden="true"><ellipse cx="80" cy="121" rx="64" ry="7" fill="#2B2340" opacity=".16"/>${open ? lid + glow : ""}
+  <rect x="20" y="56" width="120" height="62" rx="8" fill="#C9772F"/><path d="M80,56 h52 a8,8 0 0 1 8,8 v46 a8,8 0 0 1 -8,8 h-52z" fill="#A65A1C"/><rect x="20" y="70" width="120" height="4" fill="#7A3E12" opacity=".35"/>
+  <rect x="44" y="56" width="12" height="62" fill="#FFC928"/><rect x="104" y="56" width="12" height="62" fill="#F0A400"/>
+  ${open ? "" : lid}<rect x="68" y="${open ? 60 : 50}" width="24" height="26" rx="5" fill="#FFC928"/><rect x="80" y="${open ? 60 : 50}" width="12" height="26" rx="3" fill="#F0A400"/><circle cx="80" cy="${open ? 70 : 60}" r="4" fill="#5A2E10"/><rect x="78" y="${open ? 70 : 60}" width="4" height="9" fill="#5A2E10"/></svg>`;
+}
+const ICON = {
+  star: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12,2 l3,6.5 7,.8 -5.2,4.8 1.4,7 -6.2,-3.6 -6.2,3.6 1.4,-7 L2,9.3 9,8.5z" fill="#F2B705" stroke="#C98F00" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+  coin: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F2B705" stroke="#C98F00" stroke-width="2"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#FFF1B3" stroke-width="2"/></svg>`,
+  speaker: `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4,9 h4 l5,-4 v14 l-5,-4 h-4z" fill="currentColor"/><path d="M16,8.5 q2.4,3.5 0,7 M18.6,6 q4.4,6 0,12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  soundOn: `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4,9 h4 l5,-4 v14 l-5,-4 h-4z" fill="currentColor"/><path d="M16,8.5 q2.4,3.5 0,7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  soundOff: `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4,9 h4 l5,-4 v14 l-5,-4 h-4z" fill="currentColor"/><path d="M16,9 l5,6 M21,9 l-5,6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+  lock: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" fill="#8E8574"/><path d="M8,10 v-3 a4,4 0 0 1 8,0 v3" stroke="#8E8574" stroke-width="2.4" fill="none"/></svg>`,
+  shop: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3,9 h18 l-2,11 h-14z" fill="#C8553D"/><path d="M8,9 v-2 a4,4 0 0 1 8,0 v2" stroke="#7A2E22" stroke-width="2" fill="none"/><path d="M3,9 h18" stroke="#F2B705" stroke-width="2"/></svg>`,
+  medal: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7,2 h4 l2,7 h-4z M13,2 h4 l-2,7 h-4z" fill="#2B6CB0"/><circle cx="12" cy="15" r="7" fill="#F2B705" stroke="#C98F00" stroke-width="1.6"/><path d="M12,11 l1.2,2.6 2.8,.3 -2.1,1.9 .6,2.8 -2.5,-1.4 -2.5,1.4 .6,-2.8 -2.1,-1.9 2.8,-.3z" fill="#FFF1B3"/></svg>`,
+  help: `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9,9.5 a3,3 0 1 1 4,2.8 c-1,.4 -1,1 -1,2.2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="17.6" r="1.3" fill="currentColor"/></svg>`,
+  target: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E9502F"/><circle cx="12" cy="12" r="6.5" fill="#fff"/><circle cx="12" cy="12" r="3" fill="#E9502F"/></svg>`,
+  wrench: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5,3 a5,5 0 0 0 -4.6,6.8 l-6.4,6.4 a2,2 0 0 0 2.8,2.8 l6.4,-6.4 a5,5 0 0 0 6.8,-4.6 l-3,3 -2.6,-.4 -.4,-2.6z" fill="#5E7D8C"/></svg>`,
+  bulb: `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12,2 a7,7 0 0 0 -4,12.7 v2.3 h8 v-2.3 a7,7 0 0 0 -4,-12.7z" fill="#F2B705"/><rect x="8.5" y="18" width="7" height="3" rx="1" fill="#9A6B43"/></svg>`,
+};
+
+const MEDAL_GLYPH = {
+  explorer: `<path d="M-9,-6 l6,-3 6,3 6,-3 v15 l-6,3 -6,-3 -6,3z" fill="#fff"/><path d="M-3,-9 v15 M3,-6 v15" stroke="#2B6CB0" stroke-width="1.4"/>`,
+  TT: `<path d="M-10,-8 h20 a3,3 0 0 1 3,3 v8 a3,3 0 0 1 -3,3 h-11 l-6,5 v-5 h-3 a3,3 0 0 1 -3,-3 v-8 a3,3 0 0 1 3,-3z" fill="#fff"/>`,
+  SH: `<path d="M-11,-2 L0,-10 L11,-2z" fill="#fff"/><rect x="-9" y="-2" width="18" height="11" fill="#fff"/><rect x="-2" y="2" width="4" height="7" fill="#C8553D"/>`,
+  fixer: `<path d="M3,-10 a5,5 0 0 0 -4.6,6.8 l-6.4,6.4 a2,2 0 0 0 2.8,2.8 l6.4,-6.4 a5,5 0 0 0 6.8,-4.6 l-3,3 -2.6,-.4 -.4,-2.6z" fill="#fff"/>`,
+  sharp: `<circle r="10" fill="#fff"/><circle r="6" fill="#E9502F"/><circle r="2.6" fill="#fff"/>`,
+  ready: `<path d="M-8,-9 h16 v4 a8,8 0 0 1 -16,0z" fill="#fff"/><rect x="-2" y="2" width="4" height="5" fill="#fff"/><rect x="-6" y="7" width="12" height="3" fill="#fff"/>`,
+};
+function medalSVG(k, on, size = 64) {
+  const col = { explorer: "#2B6CB0", TT: "#7CB342", SH: "#C8553D", fixer: "#5E7D8C", sharp: "#E9502F", ready: "#E0A800" }[k] || "#9A6B43";
+  return `<svg viewBox="-24 -26 48 52" width="${size}" height="${size}" aria-hidden="true"${on ? "" : ' style="filter:grayscale(1);opacity:.4"'}><path d="M-10,-26 h7 l4,12 h-7z M3,-26 h7 l-4,12 h-7z" fill="#2B6CB0"/><circle r="18" fill="${col}" stroke="#F2B705" stroke-width="3.5"/>${MEDAL_GLYPH[k] || ""}</svg>`;
+}
+
+const P = {
+  sea1: "#3E86C9", sea2: "#3F84E0", sand: "#F6DFA6", grass: "#8CC152", grass2: "#6CCB3C",
+  roof: "#FF5A4E", wood: "#9A6B43", gold: "#FFC928", cream: "#FFF6E0", ink: "#3B2A1A",
+};
+const palm = (x, y, s = 1) => `<g transform="translate(${x},${y}) scale(${s})"><path d="M0,0 q3,-24 1,-46" stroke="#8B5E3C" stroke-width="5" fill="none" stroke-linecap="round"/><g transform="translate(1,-46)" fill="#36B552">${[0,45,90,135,180,225,270,315].map(a=>`<ellipse rx="15" ry="4" transform="rotate(${a}) translate(10,0)"/>`).join("")}<circle r="6" fill="#4CC864"/></g></g>`;
+const tree = (x, y, s = 1, c = "#3DBE5A") => `<g transform="translate(${x},${y}) scale(${s})"><rect x="-3" y="-6" width="6" height="14" fill="#8B5E3C"/><circle cy="-18" r="15" fill="${c}"/><circle cx="-9" cy="-10" r="10" fill="${c}"/><circle cx="9" cy="-10" r="10" fill="${c}"/><circle cx="-4" cy="-22" r="5" fill="#fff" opacity=".18"/></g>`;
+const house = (x, y, s = 1, roof = P.roof, wall = "#FFF1D6") => `<g transform="translate(${x},${y}) scale(${s})"><rect x="-14" y="-4" width="28" height="8" fill="#9A6B43"/><rect x="-12" y="-22" width="24" height="18" fill="${wall}"/><path d="M-18,-20 L0,-38 L18,-20 Z" fill="${roof}"/><path d="M0,-38 l3,-6" stroke="${roof}" stroke-width="3" stroke-linecap="round"/><rect x="-4" y="-14" width="8" height="10" fill="#8B5E3C"/><line x1="-10" y1="4" x2="-10" y2="12"/><line x1="10" y1="4" x2="10" y2="12"/></g>`;
+const cloud = (x, y, s = 1, o = 1) => `<g transform="translate(${x},${y}) scale(${s})" opacity="${o}" fill="#fff"><circle cx="0" cy="0" r="16"/><circle cx="18" cy="-6" r="20"/><circle cx="38" cy="0" r="15"/><rect x="0" y="0" width="38" height="14" rx="7"/></g>`;
+const blob = (pts) => { 
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; d += ` Q${p[0]},${p[1]} ${mx},${my}`; }
+  return d + "Z";
+};
+const scalePts = (pts, k, dy = 0) => { const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length, cy = pts.reduce((s, p) => s + p[1], 0) / pts.length; return pts.map(([x, y]) => [cx + (x - cx) * k, cy + (y - cy) * k + dy]); };
+const tufts = (inner) => { const cx = inner.reduce((s, p) => s + p[0], 0) / inner.length, cy = inner.reduce((s, p) => s + p[1], 0) / inner.length; let o = ""; for (let i = 0; i < 9; i++) { const a = i * 2.39, r = 18 + (i * 13) % 50; const x = cx + Math.cos(a) * r * 1.3, y = cy + Math.sin(a) * r * .7; o += `<path d="M${x - 4},${y} q2,-6 4,0 q2,-7 4,0" stroke="#5E9A2C" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>`; } return o; };
+const island = (pts, inner) => `
+  <path d="${blob(scalePts(pts, 1.22, 6))}" fill="#3FC3F0" opacity=".55"/>
+  <path d="${blob(scalePts(pts, 1.12, 4))}" fill="#9BE8FF" opacity=".75"/>
+  <path d="${blob(scalePts(pts, 1.05, 3))}" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-dasharray="10 7" stroke-linecap="round" opacity=".85"/>
+  <path d="${blob(scalePts(pts, 1, 9))}" fill="#E39B4A"/>
+  <path d="${blob(pts)}" fill="#FFDB8A" />
+  <path d="${blob(scalePts(inner, 1, 7))}" fill="#4FA82A"/>
+  <path d="${blob(inner)}" fill="#6CCB3C"/>
+  <path d="${blob(scalePts(inner, .82, -6))}" fill="#B5DD7A" opacity=".35"/>${tufts(inner)}`;
+const lockIco = `<g transform="translate(-6,-10)"><rect x="0" y="6" width="12" height="10" rx="2" fill="#8E8574"/><path d="M2.5,6 v-3 a3.5,3.5 0 0 1 7,0 v3" stroke="#8E8574" stroke-width="2" fill="none"/></g>`;
+const label = (x, y, name, th, stars, locked) => `<g transform="translate(${x},${y})"><rect x="-94" y="-20" width="188" height="66" rx="16" fill="${locked ? "#E7E2D8" : P.cream}" stroke="${locked ? "#B7AE9E" : P.wood}" stroke-width="3"/>${locked ? `<g transform="translate(84,-18)"><circle r="13" fill="#fff" stroke="#B7AE9E" stroke-width="2"/><g transform="translate(0,1)">${lockIco}</g></g>` : ""}<text y="2" text-anchor="middle" font-family="Mitr, sans-serif" font-size="17" font-weight="600" fill="${locked ? "#8E8574" : P.ink}">${name.replace(/&/g,"&amp;")}</text><text y="21" text-anchor="middle" font-family="Mitr, sans-serif" font-size="13" fill="${locked ? "#A39A89" : "#6B5A44"}">${th}</text><text y="39" text-anchor="middle" font-size="14" fill="${locked ? "#B7AE9E" : "#E09A00"}" font-family="Mitr, sans-serif">${"★".repeat(stars)}${"☆".repeat(3 - stars)}</text></g>`;
+
+function islandTalkTown(x, y) { 
+  return `<g transform="translate(${x},${y})">${island([[-120,-40],[-60,-85],[40,-80],[120,-40],[110,40],[20,70],[-90,55],[-130,10]],[[-105,-35],[-55,-70],[35,-66],[100,-35],[92,30],[15,55],[-80,42],[-112,8]])}
+  <path d="M-110,5 q60,-12 110,4 q50,14 100,-6" stroke="#3FC3F0" stroke-width="18" fill="none"/>
+  <g transform="translate(-40,8)"><path d="M-22,0 q22,10 44,0 l-6,6 h-32z" fill="#7A4A2A"/><circle cx="-8" cy="-4" r="5" fill="#FFC928"/><circle cx="4" cy="-4" r="5" fill="#8CC152"/><circle cx="12" cy="-3" r="4" fill="#FF4F5E"/></g>
+  <g transform="translate(45,14)"><path d="M-20,0 q20,10 40,0 l-6,6 h-28z" fill="#7A4A2A"/><path d="M-8,-2 q8,-14 16,0z" fill="#F7C6D0"/></g>
+  ${house(-70,-28,1.05)}${house(-15,-40,1)}${house(45,-30,1.1,"#3F84E0")}${house(80,40,.9,"#FFB020")}${house(-75,50,.9,"#FFB020")}${palm(105,-10,.8)}${palm(-120,-5,.7)}</g>`;
+}
+function islandSchool(x, y) {
+  return `<g transform="translate(${x},${y})">${island([[-100,-50],[0,-80],[100,-50],[115,30],[30,70],[-80,60],[-120,0]],[[-88,-42],[0,-66],[88,-42],[100,25],[25,56],[-70,48],[-104,0]])}
+  <rect x="-40" y="-10" width="90" height="48" rx="6" fill="#8EC85A" stroke="#fff" stroke-width="2" stroke-dasharray="6 5"/>
+  <g transform="translate(5,-28)"><rect x="-55" y="-26" width="110" height="34" fill="#FFF1D6"/>${[-40,-20,0,20,40].map(i=>`<rect x="${i-6}" y="-18" width="12" height="12" fill="#BDE3F6"/>`).join("")}<path d="M-62,-24 L0,-50 L62,-24Z" fill="${P.roof}"/><rect x="-5" y="-8" width="10" height="16" fill="#8B5E3C"/></g>
+  <line x1="-72" y1="30" x2="-72" y2="-40" stroke="#777" stroke-width="3"/><g transform="translate(-72,-40)"><g class="flag"><rect width="26" height="5" fill="#C8553D"/><rect y="5" width="26" height="4" fill="#fff"/><rect y="9" width="26" height="6" fill="#2B4C9A"/><rect y="15" width="26" height="4" fill="#fff"/><rect y="19" width="26" height="5" fill="#C8553D"/></g></g>
+  ${tree(80,20,.8)}${tree(-90,30,.7)}</g>`;
+}
+function islandForest(x, y) {
+  return `<g transform="translate(${x},${y})">${island([[-120,-30],[-70,-90],[30,-95],[115,-50],[125,30],[50,80],[-60,75],[-130,30]],[[-105,-26],[-62,-76],[28,-80],[100,-44],[108,26],[44,64],[-54,60],[-114,24]])}
+  ${tree(-80,-30,1.1,"#2EA34A")}${tree(-40,-55,1.3,"#36B552")}${tree(10,-60,1.2,"#2EA34A")}${tree(60,-40,1.1,"#4CC864")}${tree(85,10,1,"#2EA34A")}${tree(-95,25,1,"#36B552")}
+  <g transform="translate(-10,20)"><rect x="-30" y="-2" width="60" height="6" fill="#9A6B43"/><line x1="-24" y1="4" x2="-24" y2="18" stroke-width="3"/><line x1="24" y1="4" x2="24" y2="18" stroke-width="3"/><path d="M-36,-2 q36,-30 72,0z" fill="${P.roof}"/><path d="M-30,-14 q-8,-6 -12,-14 M30,-14 q8,-6 12,-14" stroke="${P.gold}" stroke-width="3" fill="none"/></g>
+  <g transform="translate(55,45)"><line x1="0" y1="10" x2="0" y2="-22" stroke="#7A4A2A" stroke-width="4"/><path d="M-2,-22 h26 l6,6 l-6,6 h-26z" fill="#D9A066"/><path d="M2,-6 h-24 l-6,6 l6,6 h24z" fill="#D9A066"/></g></g>`;
+}
+function islandData(x, y) {
+  const bars = [30, 52, 22, 42].map((h, i) => `<rect x="${-40 + i * 22}" y="${30 - h}" width="16" height="${h}" rx="3" fill="${["#6CCB3C","#FFC928","#FF4F5E","#3FC3F0"][i]}"/>`).join("");
+  const mill = (mx, my, s) => `<g transform="translate(${mx},${my}) scale(${s})"><path d="M-6,30 L-3,-10 h6 L6,30z" fill="#FFF1D6"/><g transform="translate(0,-12)"><g class="spin">${[0,90,180,270].map(a=>`<path d="M0,0 l4,-30 h-8z" fill="#fff" stroke-width="1.2" transform="rotate(${a+20})"/>`).join("")}</g><circle r="4" fill="${P.roof}"/></g></g>`;
+  return `<g transform="translate(${x},${y})">${island([[-110,-40],[-30,-80],[70,-70],[120,-10],[90,60],[-20,75],[-110,45]],[[-96,-34],[-26,-66],[62,-58],[104,-8],[78,48],[-18,62],[-96,38]])}
+  <rect x="-48" y="-28" width="96" height="62" rx="6" fill="#A57B4F" opacity=".35"/>${bars}<line x1="-46" y1="30" x2="46" y2="30" stroke="#5C3A1E" stroke-width="3"/>
+  ${mill(-80,-30,.9)}${mill(78,-25,1)}</g>`;
+}
+function islandWorkshop(x, y) {
+  const words = ["I","like","rice","."].map((w, i) => `<g transform="translate(${-48 + i * 32},-2)"><rect x="-14" y="-12" width="28" height="22" rx="5" fill="${["#FF4F5E","#FFC928","#6CCB3C","#3FC3F0"][i]}"/><text y="4" text-anchor="middle" font-family="Mitr, sans-serif" font-size="12" font-weight="600" fill="#fff">${w}</text></g>`).join("");
+  return `<g transform="translate(${x},${y})">${island([[-100,-50],[0,-75],[105,-40],[110,40],[20,72],[-95,50]],[[-86,-42],[0,-62],[92,-34],[96,34],[18,58],[-82,42]])}
+  <g transform="translate(0,-30)"><rect x="-60" y="-20" width="120" height="40" fill="#FFF1D6"/><path d="M-68,-18 L0,-46 L68,-18Z" fill="#9A6B43"/><path d="M-68,-18 L0,-46 L68,-18" stroke="${P.gold}" stroke-width="3" fill="none"/></g>
+  <g transform="translate(0,34)"><rect x="-68" y="-18" width="136" height="34" rx="6" fill="#7A4A2A"/>${words}</g>${palm(-88,20,.7)}${tree(88,30,.8)}</g>`;
+}
+function islandPort(x, y) {
+  const lantern = (lx, ly, c) => `<g transform="translate(${lx},${ly})"><path d="M-8,0 q8,-14 16,0 q-8,6 -16,0z" fill="${c}"/><circle cy="-8" r="2" fill="${P.gold}"/></g>`;
+  return `<g transform="translate(${x},${y})">${island([[-130,-30],[-60,-75],[60,-75],[130,-30],[120,40],[0,70],[-120,40]],[[-114,-26],[-56,-62],[56,-62],[114,-26],[104,32],[0,56],[-104,32]])}
+  <rect x="-10" y="20" width="20" height="62" fill="#9A6B43"/>${[30,44,58,72].map(yy=>`<line x1="-10" y1="${yy}" x2="10" y2="${yy}" stroke="#7A4A2A"/>`).join("")}
+  <g transform="translate(-60,-10)"><path d="M-22,10 q22,12 44,0 l-4,-8 h-36z" fill="#6CCB3C"/>${[-12,-4,4,12].map(i=>`<path d="M${i},2 l4,-14 l4,14z" fill="#F7C6D0"/>`).join("")}<line x1="2" y1="-12" x2="2" y2="-24" stroke="${P.gold}" stroke-width="2"/><circle cx="2" cy="-26" r="3" fill="#FFD54F"/></g>
+  ${lantern(-90,30,"#FFC928")}${lantern(-40,40,"#FF4F5E")}
+  <g transform="translate(62,-2)"><path d="M0,-44 L22,0 H-22Z" fill="#2EA34A"/><path d="M0,-30 L28,14 H-28Z" fill="#36B552"/><rect x="-4" y="14" width="8" height="10" fill="#8B5E3C"/><path d="M0,-52 l3,6 h6 l-5,4 l2,6 l-6,-4 l-6,4 l2,-6 l-5,-4 h6z" fill="${P.gold}"/>${[[-8,-12,"#FF4F5E"],[8,-4,"#3FC3F0"],[-12,6,P.gold],[12,10,"#FF4F5E"]].map(([a,b,c])=>`<circle cx="${a}" cy="${b}" r="3" fill="${c}"/>`).join("")}</g>
+  <g transform="translate(100,40)"><rect x="-12" y="-10" width="24" height="18" fill="#FF4F5E"/><rect x="-2" y="-10" width="4" height="18" fill="${P.gold}"/></g></g>`;
+}
+function longtail(x, y, rider) {
+  const ribbons = ["#FF4F5E","#FFC928","#6CCB3C","#3F84E0","#F7C6D0"].map((c,i)=>`<path d="M-58,-30 q${-6+i*2},${10+i*3} ${-2+i},${18+i*2}" stroke="${c}" stroke-width="2.2" fill="none"/>`).join("");
+  return `<g transform="translate(${x},${y})">
+  <path d="M60,8 q40,4 80,22 M60,12 q40,14 70,38" stroke="#fff" stroke-width="3" fill="none" opacity=".55" stroke-linecap="round"/>
+  <ellipse cx="0" cy="16" rx="66" ry="7" fill="#123F6E" opacity=".35"/>
+  <path d="M-64,-6 q4,14 22,18 h84 q16,-2 22,-14 z" fill="#D9783A"/>
+  <path d="M-60,-2 h118 M-56,4 h106" stroke="#A65A1C" stroke-width="1" opacity=".55"/>
+  <path d="M-64,-6 q-10,-10 -6,-26 q4,-4 8,2 q-2,12 6,20" fill="#D9783A"/>${ribbons}
+  <circle cx="-61" cy="-31" r="3" fill="#FFC928"/>
+  <rect x="-62" y="-8" width="126" height="5" rx="2" fill="#E9B872"/>
+  <g transform="translate(52,-10)"><rect x="-8" y="-12" width="16" height="12" rx="3" fill="#555"/><line x1="4" y1="-4" x2="36" y2="14" stroke="#666" stroke-width="3"/><circle cx="37" cy="15" r="3" fill="#888"/></g>
+  <g transform="translate(-34,-66) scale(.55)">${rider}</g></g>`;
+}
+function siamMap(opts = {}) {
+  const locked = opts.locked || ["SW", "CP"], cur = opts.current || "TT", rider = opts.rider || "";
+  const pos = { TT: [210, 190], SH: [470, 140], SS: [770, 190], DL: [250, 460], SW: [530, 470], CP: [800, 455] };
+  const names = { TT: ["Talk Town", "ตลาดน้ำ"], SH: ["School Hall", "โรงเรียน"], SS: ["Sign & Story Forest", "ป่าศาลา"], DL: ["Data Lab", "ไร่กังหันลม"], SW: ["Sentence Workshop", "บ้านทอผ้า"], CP: ["Culture Port", "ท่าเรือเทศกาล"] };
+  const stars = opts.stars || { TT: 3, SH: 2, SS: 1, DL: 0, SW: 0, CP: 0 };
+  const draw = { TT: islandTalkTown, SH: islandSchool, SS: islandForest, DL: islandData, SW: islandWorkshop, CP: islandPort };
+  const route = ["TT", "SH", "SS", "CP", "SW", "DL"];
+  const path = "M" + route.map(k => pos[k].join(",")).join(" L");
+  let g = `<defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36B8F7"/><stop offset=".6" stop-color="#1F94E6"/><stop offset="1" stop-color="#1774D0"/></linearGradient>
+  <linearGradient id="sandG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE8B8"/><stop offset="1" stop-color="#EBCB86"/></linearGradient>
+  <linearGradient id="grassG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A4D266"/><stop offset="1" stop-color="#76AE3E"/></linearGradient>
+  <radialGradient id="seaGlow" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#7EC3EE" stop-opacity=".55"/><stop offset="1" stop-color="#1F5C9E" stop-opacity="0"/></radialGradient>
+  <linearGradient id="hullG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8693C"/><stop offset="1" stop-color="#7A3E1E"/></linearGradient>
+  <pattern id="waves" width="120" height="60" patternUnits="userSpaceOnUse"><path d="M8,22 q10,-7 20,0 t20,0" stroke="#fff" stroke-width="2.2" fill="none" opacity=".30"/><path d="M68,48 q8,-6 16,0 t16,0" stroke="#fff" stroke-width="1.8" fill="none" opacity=".22"/><circle cx="100" cy="14" r="1.6" fill="#fff" opacity=".5"/></pattern></defs>
+  <rect width="1000" height="640" fill="url(#sea)"/><rect width="1000" height="640" fill="url(#seaGlow)"/><rect class="drift" x="-120" width="1240" height="640" fill="url(#waves)"/>
+  <g transform="translate(900,70)"><circle class="glow" r="44" fill="#FFD54F" opacity=".25"/><circle r="34" fill="#FFD54F"/></g>
+  <g class="cloudA">${cloud(80,60,1.1,.9)}</g><g class="cloudB">${cloud(600,50,.8,.85)}</g><g class="cloudA" style="animation-delay:-9s">${cloud(370,600,.9,.6)}</g>
+  <path d="${path}" stroke="#FFF6E0" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round" fill="none" opacity=".9"/>`;
+  for (const k of Object.keys(pos)) {
+    const [x, y] = pos[k], lk = locked.includes(k);
+    const dly = (Object.keys(pos).indexOf(k) * -0.7).toFixed(1);
+    g += `<g class="isle${lk ? " locked" : ""}" data-k="${k}" data-x="${x > 600 ? x - 175 : x + 160}" data-y="${y + 150}"><g class="bob" style="animation-delay:${dly}s"><g ${lk ? 'filter="url(#gray)" opacity=".85"' : ""}>${draw[k](x, y)}</g>`;
+    if (lk) g += `<g opacity=".92">${cloud(x - 90, y - 10, 1.6)}${cloud(x - 10, y + 20, 1.4)}${cloud(x - 60, y + 40, 1.2)}</g>`;
+    g += `</g>` + label(x, y + (k === "SH" ? 104 : 100), names[k][0], names[k][1], stars[k], lk) + `</g>`;
+  }
+  const [cx, cy] = pos[cur];
+  g += `<g id="boat" style="transform:translate(${cx > 600 ? cx - 175 : cx + 160}px,${cy + 150}px)"><g class="face"><g class="rock">${longtail(0, 0, rider)}</g></g></g>`;
+  return `<svg viewBox="0 0 1000 640"><defs><filter id="gray"><feColorMatrix type="saturate" values=".35"/></filter></defs>${g}</svg>`;
+}
+
+
+function isleSVG(k) {
+  const draw = { TT: islandTalkTown, SH: islandSchool, SS: islandForest, DL: islandData, SW: islandWorkshop, CP: islandPort }[k];
+  return `<svg viewBox="-165 -120 330 215" aria-hidden="true"><defs><linearGradient id="sandG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE8B8"/><stop offset="1" stop-color="#EBCB86"/></linearGradient><linearGradient id="grassG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A4D266"/><stop offset="1" stop-color="#76AE3E"/></linearGradient></defs><g class="bob">${draw ? draw(0, 0) : ""}</g></svg>`;
+}
+return { CHARS, SHOP, charSVG, charArt, itemSVG, chestSVG, ICON, medalSVG, siamMap, isleSVG, longtail };
+})();
+
+</script>
+<script>
+const {CHARS,SHOP,charSVG,itemSVG,chestSVG,ICON,medalSVG,siamMap,isleSVG}=SIAM;
+const LV={1:"ระดับ 1 พื้นฐาน",2:"ระดับ 2 กลาง",3:"ระดับ 3 ผ่าน"};
+const CODE_TH={FUNC:"พูดไม่เข้ากับสถานการณ์",ROLE:"สับสนว่าใครพูด",WH:"ตอบไม่ตรงคำถาม Wh-",YN:"ตอบ Yes/No ทั้งที่ต้องเลือก",CONJ:"ใช้คำเชื่อมผิด",CAUSE:"เหตุผลไม่เข้ากัน",KEY:"เห็นคำซ้ำแต่ไม่ตอบคำถาม",SYM:"อ่านป้ายผิด",MAIN:"จับใจความสำคัญไม่ได้",DATA:"อ่านตาราง/แผนภูมิผิด",NUM:"อ่านหรือคิดตัวเลขผิด",FACT:"แยกข้อเท็จจริงกับความคิดเห็นไม่ได้",ORD:"เรียงคำผิด",PUNC:"ตัวพิมพ์ใหญ่/เครื่องหมายผิด",INTO:"เสียงขึ้นลงท้ายประโยคผิด",CULT:"ข้อมูลเทศกาล/วัฒนธรรมผิด"};
+const BADGES=[{k:"explorer",n:"Explorer",d:"เล่นครบทุกเกาะที่เปิด"},{k:"TT",n:"Talk Town Master",d:"ผ่านระดับ 3 ของ Talk Town"},{k:"SH",n:"School Hall Master",d:"ผ่านระดับ 3 ของ School Hall"},{k:"fixer",n:"Fixer",d:"ผ่านด่าน Fix-it 5 ครั้ง"},{k:"sharp",n:"Sharp Eye",d:"ได้ 3 ดาว 5 รอบติดกัน"},{k:"ready",n:"O-NET Ready",d:"ผ่านระดับ 3 ครบทุกเกาะ"}];
+const ROUND=6;
+const ISLANDS=[
+  {k:"TT",name:"Talk Town",th:"ตลาดน้ำ",std:"ต 1.2 การสื่อสารระหว่างบุคคล",set:1,npc:{c:"cat",wear:{hat:"ngob"},n:"Market Cat",en:"Hello! Welcome to Talk Town, the floating market. Let's practice talking with friends.",th:"สวัสดีจ้ะ ยินดีต้อนรับสู่ตลาดน้ำ มาฝึกพูดทักทายและสนทนากับเพื่อนกันนะ"}},
+  {k:"SH",name:"School Hall",th:"โรงเรียน",std:"ต 4.1 ภาษาในโรงเรียน",set:1,npc:{c:"hornbill",wear:{},n:"Teacher Hornbill",en:"Good morning, class! In School Hall, we use English at school.",th:"อรุณสวัสดิ์นักเรียน ที่โรงเรียนนี้เราฝึกใช้ภาษาอังกฤษในห้องเรียน"}},
+  {k:"SS",name:"Sign & Story Forest",th:"ป่าศาลา",std:"ต 1.1 ป้ายและเรื่องสั้น",set:2,npc:{c:"squirrel",wear:{hat:"crown"},n:"Ranger Squirrel",en:"Hi, explorer! Read the signs and short stories in my forest.",th:"สวัสดีนักสำรวจ มาอ่านป้ายและเรื่องสั้นในป่าของฉันกัน"}},
+  {k:"DL",name:"Data Lab",th:"ไร่กังหันลม",std:"ต 1.3 ตารางและแผนภูมิ",set:2,npc:{c:"buffalo",wear:{neck:"pkm"},n:"Farmer Buffalo",en:"Hello, friend! Look at the tables and charts on my farm.",th:"สวัสดีเพื่อน มาดูตารางและแผนภูมิในไร่ของฉันกัน"}},
+  {k:"SW",name:"Sentence Workshop",th:"บ้านทอผ้า",std:"ต 2.2 ประโยคและวรรคตอน",set:3,npc:{c:"elephant",wear:{neck:"pkm"},n:"Weaver Elephant",en:"Welcome! Let's put words in order to make good sentences.",th:"ยินดีต้อนรับ มาเรียงคำให้เป็นประโยคที่ถูกต้องกัน"}},
+  {k:"CP",name:"Culture Port",th:"ท่าเรือเทศกาล",std:"ต 2.1 เทศกาลและวันสำคัญ",set:3,npc:{c:"cat",wear:{hat:"crown",neck:"malai"},n:"Festival Cat",en:"Happy festival! Let's learn about special days around the world.",th:"สุขสันต์วันเทศกาล มาเรียนรู้เทศกาลและวันสำคัญทั่วโลกกัน"}}];
+const CHAR_KEYS=["elephant","buffalo","cat","hornbill","squirrel"];
+const EMO2CHAR={"🐘":"elephant","🐃":"buffalo","🐂":"buffalo","🐱":"cat","🐈":"cat","🐦":"hornbill","🐿️":"squirrel","🐿":"squirrel"};
+const PRAISE=["Great job!","Well done!","Excellent!","You got it!","Super!"];
+let ITEMS=[],PLAYERS=[],OPEN=["TT","SH"];
+let me=null,S={},PIN="",TPIN="",CUR=null,SCREEN="";
+const $=s=>document.querySelector(s),app=$("#app");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- device preferences (this computer only) ---------- */
+const PREF={get(k,d){try{const v=localStorage.getItem("onetquest-"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("onetquest-"+k,JSON.stringify(v))}catch(e){}}};
+let MUTE=!!PREF.get("mute",false),FZ=+PREF.get("fz",1)||1;
+function applyFz(){const r=document.documentElement;r.classList.remove("fz1","fz2","fz3");r.classList.add("fz"+FZ)}
+function setFz(d){FZ=Math.min(3,Math.max(1,FZ+d));PREF.set("fz",FZ);applyFz();SFX.tap()}
+function toggleMute(){MUTE=!MUTE;PREF.set("mute",MUTE);header();if(!MUTE)SFX.tap()}
+applyFz();
+
+/* ---------- sound effects (synthesised, no files) ---------- */
+let AC=null;
+function ac(){if(MUTE)return null;try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){AC=null}return AC}
+function tone(f,t,d,type,vol,f2){const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+t;o.type=type||"sine";o.frequency.setValueAtTime(f,s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(vol||.12,s+.015);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.05)}catch(e){}}
+const SFX={
+  tap:()=>tone(520,0,.07,"triangle",.08),
+  ok:()=>{tone(660,0,.12,"triangle",.14);tone(880,.1,.12,"triangle",.14);tone(1320,.2,.24,"triangle",.12)},
+  no:()=>tone(300,0,.25,"sawtooth",.05,170),
+  coin:()=>{tone(988,.3,.08,"square",.045);tone(1319,.38,.22,"square",.045)},
+  chest:()=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.1,.28,"triangle",.12))},
+  sail:()=>{tone(200,0,.6,"sine",.07,120);tone(400,.05,.4,"triangle",.03,300)},
+  lock:()=>tone(150,0,.16,"square",.05),
+  buy:()=>{tone(784,0,.1,"triangle",.12);tone(1175,.1,.28,"triangle",.12)},
+  hello:()=>{tone(587,0,.12,"sine",.1);tone(784,.12,.2,"sine",.1)}};
+
+/* ---------- server calls ---------- */
+const API_URL="https://script.google.com/macros/s/AKfycbw2UT_3VOCqesMBYJr2oAHEyfgIHU1oicCeLrQ8hvF5i4epoA9pIwJjUzdeQzmS7Wne/exec";
+function gsr(fn,args){if(typeof google==="undefined"||!google.script)return Promise.reject("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่");return new Promise((res,rej)=>{google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(e&&e.message?e.message:String(e)))[fn](...args)})}
+let useFetch=true;
+function call(fn,...args){
+ if(!API_URL||!useFetch||typeof fetch!=="function")return gsr(fn,args);
+ const ctl=typeof AbortController!=="undefined"?new AbortController():null;
+ const tm=setTimeout(()=>{if(ctl)ctl.abort()},15000);
+ return fetch(API_URL,{method:"POST",body:JSON.stringify({fn,args}),redirect:"follow",credentials:"omit",signal:ctl?ctl.signal:undefined})
+  .then(r=>r.text()).then(t=>{clearTimeout(tm);let j;try{j=JSON.parse(t)}catch(_){throw{net:1}}return j},e=>{clearTimeout(tm);throw (e&&e.net)?e:{net:1}})
+  .then(j=>{if(j&&j.ok)return j.data;if(j&&j.ok===false)throw{srv:j.error||"error"};throw{net:1}})
+  .catch(e=>{if(e&&e.srv)throw e.srv;useFetch=false;return gsr(fn,args)})
+}
+function blankState(){return {xp:0,stats:{},ft:{},badges:[],wrong:[],codeCount:{},errTotal:{},fixits:0,streak3:0,thClicks:0,feel:{},coins:0,owned:[],wear:{},char:"",tutorialDone:false}}
+function P(){return me.state}
+const LKEY=id=>"onetquest-pending-"+id;
+function pending(){try{return JSON.parse(localStorage.getItem(LKEY(me.id)))||[]}catch(e){return []}}
+function setPending(a){try{localStorage.setItem(LKEY(me.id),JSON.stringify(a))}catch(e){}}
+function addLog(x){const a=pending();a.push(x);setPending(a)}
+function syncMsg(t,bad){const m=$("#sync");if(m){m.textContent=t;m.style.color=bad?"var(--bad)":"var(--muted)"}}
+async function flush(){
+  if(!me)return;
+  const logs=pending();
+  syncMsg("กำลังบันทึก…");
+  try{await call("saveBatch",me.id,PIN,logs,me.state);
+    const now=pending(); setPending(now.slice(logs.length)); syncMsg("บันทึกแล้ว");
+  }catch(e){syncMsg("ยังบันทึกไม่สำเร็จ (เน็ตอาจหลุด) ระบบจะลองใหม่อัตโนมัติ",true)}
+}
+
+/* ---------- characters ---------- */
+function charOf(p){if(!p)return "elephant";const saved=PREF.get("char-"+p.id,null);if(saved&&CHARS[saved])return saved;
+  if(EMO2CHAR[p.emoji])return EMO2CHAR[p.emoji];const i=Math.max(0,PLAYERS.findIndex(x=>x.id===p.id));return CHAR_KEYS[i%CHAR_KEYS.length]}
+function myChar(){return me&&P().char&&CHARS[P().char]?P().char:charOf(me)}
+function myWear(){return (me&&P().wear)||{}}
+function mood(m){const h=$("#hero");if(h){h.className="hero-c";void h.offsetWidth;h.className="hero-c "+m;h.innerHTML=charSVG(myChar(),m,150,myWear())}}
+
+/* ---------- header ---------- */
+function header(){
+  const w=$("#who");
+  const ctl=`<button class="ib" onclick="toggleMute()" aria-label="${MUTE?"เปิดเสียงประกอบ":"ปิดเสียงประกอบ"}" title="${MUTE?"เปิดเสียงประกอบ":"ปิดเสียงประกอบ"}">${MUTE?ICON.soundOff:ICON.soundOn}</button><span class="fz" role="group" aria-label="ขนาดตัวอักษร"><button class="ib" onclick="setFz(-1)" aria-label="ตัวอักษรเล็กลง" title="ตัวอักษรเล็กลง">ก-</button><button class="ib" onclick="setFz(1)" aria-label="ตัวอักษรใหญ่ขึ้น" title="ตัวอักษรใหญ่ขึ้น">ก+</button></span>`;
+  if(!me){w.innerHTML=ctl+`<button class="link" onclick="teacherLogin()">หน้าครู</button><button class="link" onclick="expertLogin()">หน้าผู้เชี่ยวชาญ</button>`;return}
+  const p=P();
+  w.innerHTML=`<span class="stat" title="XP">${ICON.star}<b id="hxp">${p.xp}</b></span><span class="stat" title="เหรียญ">${ICON.coin}<b id="hcoin">${p.coins||0}</b></span><span class="me">${charSVG(myChar(),"idle",34,myWear())}<span>${esc(me.name)}</span></span>${ctl}<button class="ib" onclick="tutorial(0)" aria-label="วิธีเล่น" title="วิธีเล่น">${ICON.help}</button><span id="sync" class="note"></span><button class="link" onclick="logout()">ออก</button>`;
+}
+function logout(){flush();me=null;PIN="";home()}
+
+/* ---------- boot ---------- */
+function boot(){
+  header();
+  app.innerHTML=`<div class="frame"><div class="hero"><h1>O-NET <span>Quest</span></h1><p>กำลังโหลดเกม…</p></div></div>`;
+  call("getBootstrap").then(d=>{ITEMS=d.items;PLAYERS=d.players;OPEN=d.open;home()})
+   .catch(e=>{app.innerHTML=`<div class="card"><b>โหลดเกมไม่สำเร็จ</b><p class="note">${esc(e)}</p><button class="btn" onclick="boot()">ลองใหม่</button></div>`});
+}
+
+/* ---------- login ---------- */
+function home(){
+  SCREEN="home";header();
+  app.innerHTML=`<div class="frame pop"><div class="hero"><h1>O-NET <span>Quest</span></h1><p>Siam Adventure · ผจญภัยหมู่เกาะสยาม</p></div>
+   <div class="pad"><h2>Who are you? <small>เลือกตัวเองเพื่อเริ่มเล่น</small></h2>
+   <div class="picker">${PLAYERS.map(p=>`<button class="pick" onclick="SFX.tap();pinScreen('${esc(p.id)}')">${charSVG(charOf(p),"idle",84)}<b>${esc(p.name)}</b><span>${esc(p.id)}</span></button>`).join("")}</div></div></div>`;
+}
+function pinScreen(id){
+  const p=PLAYERS.find(x=>x.id===id);SCREEN="pin";
+  app.innerHTML=`<div class="frame pop"><div class="pad pinbox"><div id="hero" class="hero-c" style="margin:0">${charSVG(charOf(p),"happy",130)}</div>
+   <div class="col" style="flex:1;min-width:220px"><h2>สวัสดี ${esc(p.name)}</h2>
+   <label for="spin">ใส่ PIN 4 หลักของตัวเอง</label><input id="spin" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+   <div class="row"><button class="btn" id="go" onclick="doLogin('${esc(id)}')">เข้าเกม</button><button class="link" onclick="home()">ไม่ใช่ฉัน</button></div><span id="lmsg" class="note" aria-live="polite"></span></div></div></div>`;
+  const i=$("#spin");i.focus();i.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin(id)});
+}
+async function doLogin(id){
+  const pin=$("#spin").value; $("#go").disabled=true; $("#lmsg").textContent="กำลังเข้าเกม…";
+  try{const r=await call("login",id,pin);const p=PLAYERS.find(x=>x.id===id);
+    me={...p,state:Object.assign(blankState(),r.state||{})}; me.state.start=r.start; PIN=pin;
+    if(!me.state.char)me.state.char=charOf(me); PREF.set("char-"+id,me.state.char);
+    SFX.hello(); map(); if(pending().length)flush();
+    if(!me.state.tutorialDone)tutorial(0);
+  }catch(e){$("#lmsg").textContent=e;$("#go").disabled=false;const h=$("#hero");if(h){h.innerHTML=charSVG(charOf(PLAYERS.find(x=>x.id===id)),"oops",130);h.className="hero-c oops"}SFX.no()}
+}
+
+/* ---------- progress logic (unchanged) ---------- */
+function stat(p,isl,lv){return p.stats[isl+"-"+lv]||{last:[],best:0,played:0}}
+function levelStatus(p,isl,lv){
+  const st=stat(p,isl,lv), acc=st.last.length?st.last.reduce((a,b)=>a+b,0)/st.last.length:0;
+  const passed=st.last.length>0&&acc>=0.8;
+  const start=(p.start&&p.start[isl])||1;
+  const unlocked=lv<=start||levelStatus(p,isl,lv-1).passed;
+  return {passed,unlocked,best:st.best,played:st.played,acc};
+}
+function islandProgress(p,k){let n=0;for(const l of [1,2,3]) if(levelStatus(p,k,l).passed) n++;return n/3}
+const isOpen=k=>OPEN.includes(k)&&ITEMS.some(x=>x.isl===k);
+const starStr=n=>"★".repeat(n)+"☆".repeat(3-n);
+
+/* ---------- map ---------- */
+let sailing=false;
+function map(){
+  SCREEN="map";sailing=false;header();const p=P();
+  const locked=ISLANDS.filter(i=>!isOpen(i.k)).map(i=>i.k),stars={};
+  ISLANDS.forEach(i=>stars[i.k]=Math.round(islandProgress(p,i.k)*3));
+  if(!CUR||locked.includes(CUR))CUR=(ISLANDS.find(i=>isOpen(i.k))||ISLANDS[0]).k;
+  app.innerHTML=`<div class="frame pop">
+   <div class="mapbar"><h2>Island Map <small>แผนที่หมู่เกาะ</small></h2><div class="row"><button class="btn sm gold" onclick="shop()">${ICON.shop} ร้านชุดไทย</button><button class="btn sm ghost" onclick="badges()">${ICON.medal} ตู้เหรียญ (${p.badges.length})</button></div></div>
+   <div class="mapsvg" id="mapsvg">${siamMap({locked,current:CUR,stars,rider:SIAM.charArt(myChar(),"happy",myWear())})}</div>
+   <div class="pad"><p class="hint">กดที่เกาะเพื่อแล่นเรือไป · เกาะที่มีเมฆปกคลุม ครูยังไม่เปิด</p>
+   <div class="row">${ISLANDS.filter(i=>isOpen(i.k)).map(i=>`<button class="chip" onclick="sail('${i.k}')">${i.name} <small>${i.th}</small> <span class="stars">${starStr(stars[i.k])}</span></button>`).join("")}</div></div></div>`;
+  document.querySelectorAll("#mapsvg .isle").forEach(el=>el.addEventListener("click",()=>sail(el.dataset.k)));
+}
+function sail(k){
+  if(sailing)return;
+  const el=document.querySelector(`#mapsvg .isle[data-k="${k}"]`),bt=$("#boat");
+  if(!isOpen(k)){SFX.lock();if(el&&el.animate)el.animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:300});return}
+  const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!bt||!el||still||k===CUR){CUR=k;SFX.tap();return island(k)}
+  sailing=true;SFX.sail();
+  const cur=new DOMMatrix(getComputedStyle(bt).transform).e,tx=+el.dataset.x;
+  bt.querySelector(".face").style.transform=tx>cur+5?"scaleX(-1)":"scaleX(1)";
+  bt.style.transform=`translate(${tx}px,${el.dataset.y}px)`;
+  CUR=k;setTimeout(()=>{if(SCREEN==="map")island(k);sailing=false},1700);
+}
+
+/* ---------- island ---------- */
+function island(k){
+  SCREEN="island";header();const p=P(),I=ISLANDS.find(i=>i.k===k);CUR=k;
+  S={isl:k,goal:"5"};
+  app.innerHTML=`<div class="frame pop">
+   <div class="subbar"><button class="btn sm ghost" onclick="map()">◀ แผนที่</button><h2>${I.name} <small>${I.th}</small></h2></div>
+   <div class="banner"><div class="bisle">${isleSVG(k)}</div>
+     <div class="npc"><div class="npcfig">${charSVG(I.npc.c,"happy",110,I.npc.wear)}<b>${I.npc.n}</b></div>
+     <div class="bubble"><p class="en">${esc(I.npc.en)}</p><p class="thx">${esc(I.npc.th)}</p>
+     <div class="lrow"><button class="listen sm" onclick="speak(ISLANDS.find(i=>i.k==='${k}').npc.en,.85,'#npcmsg')">${ICON.speaker} ฟัง <small>Listen</small></button><span id="npcmsg" class="note" aria-live="polite"></span></div></div></div></div>
+   <div class="pad col">
+     <div class="std">${I.std}</div>
+     <div class="goalbox"><b>${ICON.target} เป้าหมายรอบนี้ <small>Set your goal</small></b>
+       <div class="goal" id="goal">${[["4","ถูก 4 ข้อ",1],["5","ถูก 5 ข้อ",2],["6","ถูกครบ 6 ข้อ",3]].map(([v,t,n])=>`<button class="chip ${v==="5"?"on":""}" data-v="${v}" onclick="setGoal(this)"><span class="stars">${"★".repeat(n)}</span> ${t}</button>`).join("")}</div></div>
+     <div class="levels">${[1,2,3].map(l=>{const s=levelStatus(p,k,l),has=ITEMS.some(x=>x.isl===k&&x.lv===l),ok=s.unlocked&&has;
+       return `<button class="lvl ${ok?"":"locked"} ${s.passed?"on":""}" ${ok?`onclick="SFX.tap();startRound('${k}',${l})"`:"disabled"}>
+         <h3>${!ok?ICON.lock+" ":""}${LV[l]}</h3><span class="stars">${starStr(s.best)}</span>
+         <span class="note">${!has?"ยังไม่มีข้อที่ครูตรวจแล้ว":s.unlocked?(s.passed?"ผ่านแล้ว":s.played?`เล่นแล้ว ${s.played} รอบ · ต้องได้ 80% ใน 2 รอบล่าสุด`:"พร้อมเล่น"):"ผ่านระดับก่อนหน้าก่อน"}</span></button>`}).join("")}</div></div></div>`;
+}
+function setGoal(b){document.querySelectorAll("#goal .chip").forEach(c=>c.classList.remove("on"));b.classList.add("on");S.goal=b.dataset.v;SFX.tap()}
+
+/* ---------- round (logic unchanged) ---------- */
+function startRound(k,l,fixCode){
+  const p=P(); let pool;
+  if(fixCode){pool=shuffle(ITEMS.filter(i=>i.c.includes(fixCode))).slice(0,3)}
+  else{
+    pool=shuffle(ITEMS.filter(i=>i.isl===k&&i.lv===l)).slice(0,ROUND);
+    const review=p.wrong.map(id=>ITEMS.find(i=>i.id===id)).filter(i=>i&&i.isl===k&&!pool.includes(i));
+    if(review.length&&pool.length>=ROUND){pool[ROUND-1]=review[Math.floor(Math.random()*review.length)];pool=shuffle(pool)}
+  }
+  S={...S,isl:k,lv:l,fix:fixCode||null,items:pool.map(it=>({it,ord:shuffle([0,1,2,3])})),i:0,ok:0,xp:0,coins:0,res:[]};
+  question();
+}
+const WATER_BOAT=`<svg class="water" viewBox="0 0 230 90" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36B8F7"/><stop offset="1" stop-color="#1774D0"/></linearGradient><linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E08A45"/><stop offset="1" stop-color="#C2632A"/></linearGradient></defs><rect y="40" width="230" height="50" fill="url(#w2)"/><path d="M0,44 q15,-6 30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0 t30,0" stroke="#fff" stroke-width="2.5" fill="none" opacity=".6"/><path d="M20,62 q10,-4 20,0 M150,72 q10,-4 20,0 M90,80 q8,-3 16,0" stroke="#fff" stroke-width="2" fill="none" opacity=".4"/><ellipse cx="115" cy="62" rx="98" ry="7" fill="#123F6E" opacity=".35"/><path d="M14,32 q6,20 30,24 h130 q22,-3 30,-20z" fill="url(#h2)"/><path d="M20,40 h180 M26,48 h160" stroke="#4E2610" stroke-width="1.2" opacity=".5"/><path d="M14,32 q-12,-12 -6,-30 q5,-5 9,2 q-3,14 7,26z" fill="url(#h2)"/><path d="M12,4 q-6,10 -2,20 M12,4 q-2,12 2,22 M12,4 q2,10 6,18" stroke="#E9502F" stroke-width="2" fill="none"/><path d="M12,4 q-8,8 -6,16" stroke="#F2B705" stroke-width="2" fill="none"/><circle cx="12" cy="3" r="3.5" fill="#F2B705"/><rect x="14" y="28" width="192" height="6" rx="3" fill="#E9B872"/></svg>`;
+function question(){
+  SCREEN="question";header();
+  const q=S.items[S.i],it=q.it,I=ISLANDS.find(i=>i.k===S.isl);
+  S.try=1;S.qt=Date.now();
+  app.innerHTML=`<div class="frame pop">
+   <div class="subbar"><button class="btn sm ghost" onclick="island('${S.isl}')">◀ ออก</button><h2>${S.fix?`Fix-it <small>${esc(CODE_TH[S.fix]||S.fix)}</small>`:`${I.name} <small>${LV[S.lv]}</small>`}</h2>
+     <span class="dots" aria-label="ข้อ ${S.i+1} จาก ${S.items.length}">${S.items.map((_,j)=>`<i class="${j<S.i?(S.res[j]?"ok":"no"):j===S.i?"cur":""}"></i>`).join("")}</span></div>
+   <div class="q"><div class="confetti" id="conf"></div>
+     <div class="dock">${WATER_BOAT}<div id="hero" class="hero-c">${charSVG(myChar(),"idle",150,myWear())}</div></div>
+     <div class="bubble qb"><div class="lrow"><button class="listen" onclick="say(.85)">${ICON.speaker} ฟัง <small>Listen</small></button><button class="listen slow" onclick="say(.6)">ฟังช้า ๆ</button><span id="saymsg" class="note" aria-live="polite"></span></div>
+       ${pic(it.img)}<div class="ctx">${fmt(it.ctx)}</div><div class="ask">${esc(it.q)}</div></div></div>
+   <div class="opts" id="opts">${q.ord.map((o,j)=>`<button class="opt" data-o="${o}" onclick="answer(${o},this)"><span class="k k${j}">${"ABCD"[j]}</span><span>${esc(it.o[o])}</span></button>`).join("")}</div>
+   <div id="fb" aria-live="polite"></div>
+   <div class="bar"><i style="width:${Math.round(100*S.i/S.items.length)}%"></i></div></div>`;
+}
+const isPic=v=>String(v||"").indexOf("data:")===0;
+function pic(v){if(!v)return "";return isPic(v)?`<div class="pic"><img src="${v}" alt=""></div>`:`<div class="em">${esc(v)}</div>`}
+function fmt(t){return esc(t).replace(/^([A-Za-z][A-Za-z ]{0,18}):/gm,"<b>$1:</b>")}
+function confetti(){const c=$("#conf");if(!c)return;c.innerHTML=Array.from({length:24},(_,i)=>`<i style="left:${4+Math.random()*92}%;background:${["#F2B705","#E9502F","#7CB342","#2B6CB0","#F7C6D0"][i%5]};animation-delay:${(Math.random()*.3).toFixed(2)}s"></i>`).join("");setTimeout(()=>{if(c)c.innerHTML=""},2200)}
+function answer(o,btn){
+  const p=P(), q=S.items[S.i], it=q.it, lv=S.fix?1:S.lv, correct=o===0;
+  addLog({t:Date.now(),id:it.id,isl:it.isl,lv:it.lv,ans:"ABCD"[q.ord.indexOf(o)],ok:correct,code:it.c[o],try:S.try,ms:Date.now()-S.qt,fix:!!S.fix});
+  if(S.try===1&&!S.fix){p.ft[it.isl]=p.ft[it.isl]||{n:0,ok:0};p.ft[it.isl].n++;if(correct)p.ft[it.isl].ok++}
+  const opts=[...document.querySelectorAll(".opt")];
+  if(correct){
+    btn.classList.add("ok");opts.forEach(b=>b.disabled=true);
+    const gain=S.try===1?10:5; S.xp+=gain;
+    if(S.try===1){S.ok++;S.coins++;S.res[S.i]=true;p.wrong=p.wrong.filter(x=>x!==it.id)} else S.res[S.i]=false;
+    SFX.ok();if(S.try===1)SFX.coin();mood("happy");confetti();
+    showFb(true,it,0,lv,`+${gain} XP${S.try===1?" · +1 เหรียญ":""}`);
+  }else{
+    btn.classList.add("no");btn.disabled=true;SFX.no();mood("oops");
+    const code=it.c[o]; p.codeCount[code]=(p.codeCount[code]||0)+1; p.errTotal[code]=(p.errTotal[code]||0)+1;
+    if(!p.wrong.includes(it.id)) p.wrong.push(it.id);
+    if(S.try===1){S.try=2;S.res[S.i]=false;showFb(false,it,o,lv,"ลองอีกครั้ง (Try again)")}
+    else{opts.forEach(b=>{b.disabled=true;if(+b.dataset.o===0)b.classList.add("ok")});showFb(false,it,o,lv,"ดูคำตอบที่ถูกแล้วไปต่อ",true)}
+  }
+}
+function showFb(ok,it,o,lv,tag,final){
+  S.curTh=`<div class="th">${ICON.bulb}<span>${esc(it.th[o])}</span></div>`;
+  const thPart=!it.th[o]?"":lv===1?S.curTh:lv===2?`<button class="btn sm ghost thbtn" onclick="revealTh(this)">${ICON.bulb} ดูคำอธิบายภาษาไทย</button>`:"";
+  const head=ok?PRAISE[Math.floor(Math.random()*PRAISE.length)]:final?"Let's check the answer.":"Oops! Try again.";
+  const next=ok||final?`<div class="next"><button class="btn ${ok?"":"blue"}" onclick="nextQ()">${S.i<S.items.length-1?"Next ▶":"See results ▶"}</button></div>`:"";
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"no"} pop"><b>${head}</b><span class="tag">${tag}</span>${it.en[o]?`<span class="en">${esc(it.en[o])}</span>`:""}</div>${thPart}${next}`;
+}
+function revealTh(b){b.outerHTML=S.curTh;P().thClicks++}
+function nextQ(){SFX.tap();S.i++; if(S.i<S.items.length) question(); else results()}
+
+/* ---------- results + treasure chest ---------- */
+const STAR_SVG=on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12,2 l3,6.5 7,.8 -5.2,4.8 1.4,7 -6.2,-3.6 -6.2,3.6 1.4,-7 L2,9.3 9,8.5z" fill="${on?"#F2B705":"#E8DBBB"}" stroke="${on?"#C98F00":"#D2C29C"}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+function results(){
+  SCREEN="results";
+  const p=P(), n=S.items.length, stars=S.fix?0:(S.ok>=6?3:S.ok>=5?2:S.ok>=4?1:0);
+  const bonus=S.fix&&S.ok>=2?15:0; p.xp+=S.xp+bonus;
+  if(S.fix&&S.ok>=2){p.fixits++;p.codeCount[S.fix]=0}
+  if(!S.fix){const k=S.isl+"-"+S.lv, st=stat(p,S.isl,S.lv);st.last=st.last.concat([S.ok/n]).slice(-2);st.best=Math.max(st.best,stars);st.played++;p.stats[k]=st;p.streak3=stars===3?p.streak3+1:0}
+  const before=new Set(p.badges), earn=k=>{if(!p.badges.includes(k))p.badges.push(k)};
+  const openK=OPEN.filter(k=>ITEMS.some(x=>x.isl===k));
+  if(openK.length&&openK.every(k=>[1,2,3].some(l=>stat(p,k,l).played))) earn("explorer");
+  for(const k of ["TT","SH"]) if(levelStatus(p,k,3).passed) earn(k);
+  if(p.fixits>=5) earn("fixer"); if(p.streak3>=5) earn("sharp");
+  if(ISLANDS.every(i=>levelStatus(p,i.k,3).passed)) earn("ready");
+  const newB=p.badges.filter(b=>!before.has(b)).map(b=>BADGES.find(x=>x.k===b)).filter(Boolean);
+  const fixCode=!S.fix&&Object.entries(p.codeCount).filter(([c,v])=>v>=2&&c!=="-").sort((a,b)=>b[1]-a[1]).map(x=>x[0])[0];
+  const goalMet=S.fix?null:S.ok>=+S.goal;
+  
+  S.chest=S.fix?(S.ok>=2?5:0):(stars?stars*5+(goalMet?5:0):0);
+  p.coins=(p.coins||0)+S.coins+S.chest;
+  header();
+  const chestPart=S.chest?`<button class="chestbtn shut" id="chest" onclick="openChest()" aria-label="เปิดหีบสมบัติ">${chestSVG(false)}<span>แตะเพื่อเปิดหีบสมบัติ</span></button>`
+    :`<div class="hero-c oops" style="margin:0">${charSVG(myChar(),"oops",150,myWear())}</div><p class="note" style="text-align:center">ได้ 4 ข้อขึ้นไปเพื่อเปิดหีบสมบัติ<br>ใกล้แล้ว ลองอีกครั้งนะ</p>`;
+  app.innerHTML=`<div class="frame pop"><div class="subbar"><h2>${S.fix?"Fix-it complete!":"Round complete!"} <small>${ISLANDS.find(i=>i.k===S.isl).name}</small></h2></div>
+   <div class="pad res"><div class="col">
+     ${S.fix?"":`<div class="bigstars" aria-label="${stars} ดาว">${[1,2,3].map(i=>STAR_SVG(i<=stars)).join("")}</div>`}
+     <div>ถูกครั้งแรก <b>${S.ok}/${n}</b> ข้อ · ได้ <b>+${S.xp+bonus} XP</b> · <b>+${S.coins}</b> เหรียญ</div>
+     ${goalMet===null?"":`<div class="msg ${goalMet?"ok":"no"}">${ICON.target} ${goalMet?"ทำได้ตามเป้าหมายที่ตั้งไว้! (โบนัส +5 เหรียญในหีบ)":"ยังไม่ถึงเป้าหมาย ลองอีกครั้งนะ"}</div>`}
+     ${newB.length?`<div><b>เหรียญรางวัลใหม่!</b><div class="badges" style="margin-top:8px">${newB.map(b=>`<div class="badge">${medalSVG(b.k,true,64)}<b>${b.n}</b></div>`).join("")}</div></div>`:""}
+     <div><b>รู้สึกอย่างไรกับรอบนี้?</b><div class="feel" id="feel">${[["😀","happy","สนุก"],["😐","idle","เฉย ๆ"],["😕","oops","ยาก"]].map(([e,m,t])=>`<button onclick="feel(this,'${e}')" aria-label="${t}">${charSVG(myChar(),m,54,myWear())}${t}</button>`).join("")}</div></div>
+   </div><div class="col" style="align-items:center">${chestPart}<div id="gain" aria-live="polite"></div></div></div>
+   ${fixCode?`<div class="pad" style="padding-top:0"><div class="msg no col" style="gap:6px"><b>${ICON.wrench} ด่านซ่อม Fix-it เปิดแล้ว!</b><span>คุณเลือกผิดแบบ "${CODE_TH[fixCode]||fixCode}" มากกว่า 1 ครั้ง ลองฝึก 3 ข้อสั้น ๆ</span><button class="btn blue sm" style="align-self:flex-start" onclick="startRound('${S.isl}',${S.lv},'${fixCode}')">เริ่ม Fix-it</button></div></div>`:""}
+   <div class="pad row" style="padding-top:0"><button class="btn ghost" onclick="island('${S.isl}')">เลือกระดับ</button><button class="btn ghost" onclick="map()">แผนที่</button><button class="btn gold" onclick="shop()">${ICON.shop} ร้านชุดไทย</button></div></div>`;
+  if(S.chest&&!MUTE)tone(392,0,.15,"triangle",.08);
+  flush();
+}
+function openChest(){
+  const b=$("#chest");if(!b||b.classList.contains("open"))return;
+  b.className="chestbtn open";b.innerHTML=chestSVG(true)+`<span>หีบสมบัติ</span>`;SFX.chest();
+  $("#gain").innerHTML=`<div class="gain pop">${ICON.coin} +${S.chest} เหรียญ</div>`;
+}
+function feel(b,e){document.querySelectorAll("#feel button").forEach(x=>x.classList.remove("on"));b.classList.add("on");const p=P();p.feel[e]=(p.feel[e]||0)+1;b.parentNode.querySelectorAll("button").forEach(x=>x.disabled=true);SFX.tap()}
+function badges(){
+  SCREEN="badges";header();const p=P();
+  app.innerHTML=`<div class="frame pop"><div class="subbar"><button class="btn sm ghost" onclick="map()">◀ แผนที่</button><h2>ตู้เหรียญ <small>Badges</small></h2></div>
+   <div class="pad"><div class="badges">${BADGES.map(b=>{const on=p.badges.includes(b.k);return `<div class="badge ${on?"":"off"}">${medalSVG(b.k,on,72)}<b>${b.n}</b><div class="note">${b.d}</div></div>`}).join("")}</div></div></div>`;
+}
+
+/* ---------- Thai costume shop (cosmetic only) ---------- */
+function shop(){
+  SCREEN="shop";header();const p=P(),w=myWear();
+  app.innerHTML=`<div class="frame pop"><div class="subbar"><button class="btn sm ghost" onclick="map()">◀ แผนที่</button><h2>ร้านชุดไทย <small>Thai Costume Shop</small></h2><span class="stat">${ICON.coin}<b>${p.coins||0}</b></span></div>
+   <div class="shop"><div class="preview">${charSVG(myChar(),"happy",190,w)}<b style="font-family:var(--display)">${CHARS[myChar()].name} <small class="note">${CHARS[myChar()].th}</small></b>
+     <span class="note">เปลี่ยนตัวละคร</span><div class="minis">${CHAR_KEYS.map(k=>`<button class="mini ${k===myChar()?"on":""}" onclick="pickChar('${k}')" aria-label="${CHARS[k].name}">${charSVG(k,"idle",46)}<span>${CHARS[k].name}</span></button>`).join("")}</div>
+     <p class="note" style="margin:0">ของตกแต่งซื้อด้วยเหรียญจากการตอบถูก<br>ไม่มีผลต่อคะแนนหรือการผ่านด่าน</p></div>
+   <div class="items">${SHOP.map(s=>{const own=(p.owned||[]).includes(s.k),on=w[s.slot]===s.k;
+     return `<div class="item ${on?"on":""}">${itemSVG(s.k,78)}<b>${s.en}</b><span>${s.th}</span>${own?`<button class="btn sm ${on?"ghost":""}" onclick="wearItem('${s.k}')">${on?"ถอดออก":"สวมใส่"}</button>`:`<button class="btn sm gold" ${(p.coins||0)<s.price?"disabled":""} onclick="buy('${s.k}')">${ICON.coin} ${s.price}</button>`}</div>`}).join("")}</div></div></div>`;
+}
+function buy(k){const p=P(),s=SHOP.find(x=>x.k===k);p.owned=p.owned||[];if(!s||p.owned.includes(k)||(p.coins||0)<s.price)return;p.coins-=s.price;p.owned.push(k);p.wear=Object.assign({},p.wear,{[s.slot]:k});SFX.buy();shop();flush()}
+function wearItem(k){const p=P(),s=SHOP.find(x=>x.k===k);p.wear=Object.assign({},p.wear);p.wear[s.slot]=p.wear[s.slot]===k?"":k;SFX.tap();shop();flush()}
+function pickChar(k){if(!CHARS[k])return;P().char=k;PREF.set("char-"+me.id,k);SFX.tap();if(SCREEN==="shop")shop();else header();flush()}
+
+/* ---------- first-time tutorial (about 1 minute) ---------- */
+const BOAT_ART=()=>`<svg viewBox="-110 -110 260 140" width="260" aria-hidden="true"><defs><linearGradient id="hullG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E08A45"/><stop offset="1" stop-color="#C2632A"/></linearGradient></defs><rect x="-110" y="0" width="260" height="30" fill="#5DB3E6"/><g class="rock">${SIAM.longtail(0,0,SIAM.charArt(myChar(),"happy",myWear()))}</g></svg>`;
+const TUT=[
+  {t:"ยินดีต้อนรับสู่ O-NET Quest!",d:"เลือกเพื่อนร่วมเดินทางของเรา (เปลี่ยนได้ทีหลังที่ร้านชุดไทย)",art:()=>charSVG(myChar(),"happy",130,myWear()),pick:true},
+  {t:"ล่องเรือไปตามเกาะ",d:"กดที่เกาะบนแผนที่ เรือหางยาวจะพาไป แต่ละเกาะฝึกทักษะคนละแบบ เกาะที่มีเมฆปกคลุม ครูยังไม่เปิด",art:BOAT_ART},
+  {t:"ฟังแล้วตอบ",d:"อ่านสถานการณ์ กดปุ่ม ฟัง เพื่อฟังเสียงอ่าน (ฟังช้า ๆ ได้) แล้วเลือกคำตอบ A B C D ถ้าตอบผิด ลองได้อีก 1 ครั้ง",art:()=>`<span class="listen" style="margin-bottom:30px">${ICON.speaker} ฟัง <small>Listen</small></span>${charSVG(myChar(),"idle",110,myWear())}`},
+  {t:"สะสมรางวัล",d:"ตอบถูกได้ XP และเหรียญ ได้ 4 ข้อขึ้นไปเปิดหีบสมบัติได้ นำเหรียญไปซื้อชุดไทยให้ตัวละคร เช่น งอบ ผ้าขาวม้า พวงมาลัย",art:()=>`<div style="width:150px">${chestSVG(true)}</div>${charSVG(myChar(),"happy",110,{hat:"ngob",neck:"malai"})}`},
+  {t:"ตั้งค่าได้เอง",d:"มุมบนมีปุ่มเปิด/ปิดเสียงประกอบ ปุ่ม ก- ก+ ปรับขนาดตัวอักษร และปุ่ม ? ดูวิธีเล่นอีกครั้ง พร้อมแล้วไปผจญภัยกัน!",art:()=>`<div class="row" style="margin-bottom:40px"><span class="ib">${ICON.soundOn}</span><span class="ib">ก-</span><span class="ib">ก+</span><span class="ib">${ICON.help}</span></div>${charSVG(myChar(),"happy",110,myWear())}`}];
+function tutorial(i){
+  if(!me)return;let o=$("#tut");
+  if(!o){o=document.createElement("div");o.id="tut";o.className="tut";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");document.body.appendChild(o)}
+  const s=TUT[i],last=i===TUT.length-1;
+  o.innerHTML=`<div class="tbox pop"><div class="tart">${s.art()}</div><div class="tbody"><div class="tdots">${TUT.map((_,j)=>`<i class="${j===i?"on":""}"></i>`).join("")}</div>
+    <h2>${s.t}</h2><p>${s.d}</p>
+    ${s.pick?`<div class="minis">${CHAR_KEYS.map(k=>`<button class="mini ${k===myChar()?"on":""}" onclick="pickChar('${k}');tutorial(0)" aria-label="${CHARS[k].name}">${charSVG(k,"idle",56)}<span>${CHARS[k].name}</span><span class="note">${CHARS[k].th}</span></button>`).join("")}</div>`:""}
+    <div class="row" style="justify-content:space-between"><button class="link" onclick="endTutorial()">ข้าม</button>
+    <div class="row">${i?`<button class="btn ghost sm" onclick="tutorial(${i-1})">◀ ย้อน</button>`:""}<button class="btn ${last?"gold":""}" id="tnext" onclick="${last?"endTutorial()":`tutorial(${i+1})`}">${last?"เริ่มผจญภัย!":"ถัดไป ▶"}</button></div></div></div></div>`;
+  SFX.tap();const n=$("#tnext");if(n)n.focus();
+}
+function endTutorial(){const o=$("#tut");if(o)o.remove();if(!me)return;const was=P().tutorialDone;P().tutorialDone=true;if(SCREEN==="map")map();else header();if(!was)flush()}
+
+/* ---------- teacher ---------- */
+function teacherLogin(){
+  SCREEN="teacher";
+  app.innerHTML=`<div class="card pop col" style="max-width:420px"><h2>หน้าครู</h2>
+   <label for="pin">PIN ครู</label><input id="pin" type="password" inputmode="numeric" maxlength="8">
+   <div class="row"><button class="btn" onclick="TPIN=$('#pin').value;teacher()">เข้าสู่หน้าครู</button><button class="link" onclick="home()">กลับ</button></div><span id="pinmsg" class="note"></span></div>`;
+}
+async function teacher(){
+  let d; try{d=await call("teacherData",TPIN)}catch(e){const m=$("#pinmsg");if(m)m.textContent=e;else alertBox(e);return}
+  header();
+  const rows=d.players.map(pl=>{const p=Object.assign(blankState(),pl.state||{});p.start=pl.start;
+    return `<tr><td>${esc(pl.id)}<div class="note">${esc(pl.name)}</div></td>${OPEN.map(k=>{
+      const lvNow=[3,2,1].find(l=>levelStatus(p,k,l).unlocked)||1, passed=[1,2,3].filter(l=>levelStatus(p,k,l).passed).length;
+      const f=p.ft[k], acc=f&&f.n?Math.round(100*f.ok/f.n)+"%":"–";
+      return `<td><span class="pill p${lvNow}">${LV[lvNow]}</span><div class="note">ผ่าน ${passed}/3 · ถูก ${acc}</div>
+        <select aria-label="ระดับเริ่ม ${k}" onchange="setStart('${esc(pl.id)}','${k}',this.value)">${[1,2,3].map(l=>`<option value="${l}" ${pl.start[k]==l?"selected":""}>เริ่มระดับ ${l}</option>`).join("")}</select></td>`}).join("")}
+    <td>${p.xp}</td><td>${p.thClicks}</td></tr>`}).join("");
+  const all={};d.players.forEach(pl=>{const e=(pl.state&&pl.state.errTotal)||{};for(const c in e)all[c]=(all[c]||0)+e[c]});
+  const top=Object.entries(all).filter(([c])=>c!=="-").sort((a,b)=>b[1]-a[1]).slice(0,3);
+  app.innerHTML=`<div class="col pop">
+   <div class="row" style="justify-content:space-between"><h2>หน้าครู</h2><div class="row"><a class="link" href="${esc(d.url)}" target="_blank" rel="noopener">เปิด Google Sheet</a><button class="link" onclick="teacher()">รีเฟรช</button><button class="link" onclick="TPIN='';home()">ออก</button></div></div>
+   <div class="card"><b>ข้อผิดพลาดที่พบบ่อยของทั้งชั้น (ใช้ในขั้น P)</b>
+     <div style="margin-top:8px">${top.length?top.map(([c,v],i)=>`<div>${i+1}. <b>${c}</b> ${CODE_TH[c]||""} — ${v} ครั้ง</div>`).join(""):'<span class="note">ยังไม่มีข้อมูล ให้นักเรียนเล่นก่อน</span>'}</div></div>
+   <div class="card tablewrap"><table><thead><tr><th>นักเรียน</th>${OPEN.map(k=>`<th>${ISLANDS.find(i=>i.k===k).name}</th>`).join("")}<th>XP</th><th>กดดูคำอธิบายไทย</th></tr></thead><tbody>${rows}</tbody></table>
+   <p class="note">ระดับเริ่มตั้งจากผลทดสอบก่อนเรียน: ต่ำกว่า 50% = 1, 50–79% = 2, 80% ขึ้นไป = 3 · ข้อมูลทุกคำตอบอยู่ในแท็บ "บันทึกคำตอบ" ของ Google Sheet · เหรียญและชุดไทยเป็นของตกแต่ง ไม่มีผลต่อระดับ</p></div>
+   <div class="card col" style="gap:8px"><b>ทดสอบเสียงบนเครื่องนี้</b>
+     <div class="row"><button class="btn ghost" onclick="voiceTest()">${ICON.soundOn} ทดสอบเสียงอ่าน</button></div><div id="vt" class="note"></div></div></div>`;
+}
+async function setStart(id,k,v){try{await call("setStart",TPIN,id,k,+v)}catch(e){alertBox(e)}}
+function alertBox(t){const d=document.createElement("div");d.className="msg no";d.textContent=String(t);app.prepend(d);setTimeout(()=>d.remove(),5000)}
+
+/* ---------- expert ---------- */
+function expertLogin(){
+  SCREEN="expert";
+  app.innerHTML=`<div class="card pop col" style="max-width:420px"><h2>หน้าผู้เชี่ยวชาญ</h2>
+   <label for="epin">PIN ผู้เชี่ยวชาญ</label><input id="epin" type="password" maxlength="8">
+   <div class="row"><button class="btn" onclick="expertLoad()">เข้าดูข้อสอบ</button><button class="link" onclick="home()">กลับ</button></div><span id="emsg" class="note"></span></div>`;
+}
+async function expertLoad(){try{S.exItems=await call("expertItems",$("#epin").value);S.ef="ALL";expert()}catch(e){$("#emsg").textContent=e}}
+function expert(){
+  header();const f=S.ef||"ALL", all=S.exItems||[], list=all.filter(i=>f==="ALL"||i.isl===f);
+  app.innerHTML=`<div class="col pop">
+   <div class="row" style="justify-content:space-between"><h2>หน้าผู้เชี่ยวชาญ (${list.length} ข้อ)</h2><button class="link" onclick="home()">กลับ</button></div>
+   <div class="row"><label for="ef">เกาะ</label><select id="ef" onchange="S.ef=this.value;expert()"><option value="ALL">ทั้งหมด</option>${ISLANDS.map(i=>`<option value="${i.k}" ${f===i.k?"selected":""}>${i.name}</option>`).join("")}</select></div>
+   <div class="card tablewrap"><table><thead><tr><th>รหัส</th><th>ตัวชี้วัด</th><th>สถานการณ์ / คำถาม</th><th>ตัวเลือก (✓ = เฉลย) · รหัสตัวลวง</th></tr></thead><tbody>
+   ${list.map(i=>`<tr><td>${esc(i.id)}<div class="note">${LV[i.lv]||i.lv}</div><div class="note">${esc(i.status)}</div></td><td>${esc(i.ind)}<div class="note">${esc(i.fn)}</div></td><td style="white-space:pre-line;min-width:200px">${pic(i.img)}${esc(i.ctx)}<div><b>${esc(i.q)}</b></div></td>
+     <td style="min-width:220px">${i.o.map((o,j)=>`<div>${j===0?"✓":"·"} ${esc(o)} <span class="note">${j?esc(i.c[j]):""}</span></div>`).join("")}</td></tr>`).join("")}
+   </tbody></table></div></div>`;
+}
+
+/* ---------- read aloud (Web Speech API) ---------- */
+function sayMsg(t,sel){const m=$(sel||"#saymsg");if(m)m.textContent=t}
+function getVoices(){return new Promise(res=>{let v=[];try{v=speechSynthesis.getVoices()}catch(e){}
+  if(v.length)return res(v);let done=false;const fin=()=>{if(done)return;done=true;let w=[];try{w=speechSynthesis.getVoices()}catch(e){}res(w)};
+  try{speechSynthesis.addEventListener("voiceschanged",fin,{once:true})}catch(e){}setTimeout(fin,1500)})}
+function say(rate){const it=S.items[S.i].it;speak((it.ctx+". "+it.q).replace(/_+/g,"blank").replace(/\n/g,". "),rate||.85,"#saymsg")}
+async function speak(text,rate,sel){
+  if(!("speechSynthesis" in window)){sayMsg("เบราว์เซอร์นี้ไม่รองรับการอ่านออกเสียง ลองเปิดเกมใน Google Chrome หรือ Microsoft Edge",sel);return}
+  sayMsg("กำลังโหลดเสียง…",sel);
+  const voices=await getVoices();
+  const en=voices.filter(v=>/^en(-|_|$)/i.test(v.lang));
+  if(!voices.length){sayMsg("เครื่องนี้ยังไม่มีเสียงสำหรับอ่านออกเสียง ลองเปิดใน Google Chrome หรือติดตั้งเสียงภาษาอังกฤษในการตั้งค่าเครื่อง",sel);return}
+  if(!en.length){sayMsg("เครื่องนี้ไม่มีเสียงภาษาอังกฤษ ติดตั้งได้ที่ การตั้งค่า > เวลาและภาษา > เสียงพูด (Speech)",sel);return}
+  const voice=en.find(v=>/en-US/i.test(v.lang)&&/Google|Natural|Online/i.test(v.name))||en.find(v=>/en-US/i.test(v.lang))||en[0];
+  try{
+    speechSynthesis.cancel();
+    setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(text);u.voice=voice;u.lang=voice.lang;u.rate=rate||.85;u.volume=1;
+      u.onstart=()=>sayMsg("กำลังอ่าน…",sel);u.onend=()=>sayMsg("",sel);
+      u.onerror=e=>sayMsg("อ่านออกเสียงไม่ได้ ("+(e.error||"error")+") ลองเปิดเกมใน Google Chrome",sel);
+      try{speechSynthesis.resume()}catch(e){}
+      speechSynthesis.speak(u);
+      setTimeout(()=>{const m=$(sel);if(!speechSynthesis.speaking&&m&&/โหลด/.test(m.textContent))sayMsg("ไม่มีเสียงออก ลองเช็กว่าเปิดลำโพงอยู่ หรือเปิดเกมใน Google Chrome",sel)},2500);
+    },120);
+  }catch(e){sayMsg("อ่านออกเสียงไม่ได้ ลองเปิดเกมใน Google Chrome",sel)}
+}
+async function voiceTest(){
+  const out=$("#vt");
+  if(!("speechSynthesis" in window)){out.textContent="เบราว์เซอร์นี้ไม่รองรับการอ่านออกเสียง";return}
+  out.textContent="กำลังตรวจ…";const v=await getVoices();const en=v.filter(x=>/^en(-|_|$)/i.test(x.lang));
+  out.innerHTML=`เสียงทั้งหมด ${v.length} เสียง · เสียงอังกฤษ ${en.length} เสียง${en.length?": "+esc(en.slice(0,4).map(x=>x.name).join(", ")):""}<br>${v.length&&en.length?"เครื่องนี้พร้อมอ่านออกเสียง กำลังลองพูด Hello, students!":"เครื่องนี้ยังไม่มีเสียงภาษาอังกฤษ"}`;
+  if(en.length){try{speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance("Hello, students!");u.voice=en.find(x=>/en-US/i.test(x.lang))||en[0];u.lang=u.voice.lang;speechSynthesis.speak(u)},120)}catch(e){}}
+}
+
+boot();
+</script>
+</body>
+</html>
